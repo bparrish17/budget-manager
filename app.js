@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const morgan = require('morgan')
 const bodyParser = require('body-parser')
@@ -5,7 +6,9 @@ const session = require('express-session')
 const PORT = process.env.PORT || 3000
 const app = express();
 const http = require('http').Server(app);
-require('./secrets')
+
+module.exports = app
+// require('./secrets')
 
 /**
  * In your development environment, you can keep all of your
@@ -28,11 +31,14 @@ app.use(session({
   resave: false,
   saveUninitialized: false
 }))
+// static file-serving middleware
+app.use(express.static(path.join(__dirname, './public')))
 
-app.use((req, res, next) => {
-  console.log('REQ SESSION', req.session)
-  next();
+app.use('*', (req, res) => {
+  console.log('req.session.cookie', req.session.cookie);
+  res.sendFile(path.join(__dirname, './public/index.html'))
 })
+
 
 // error handling endware
 app.use((err, req, res, next) => {
@@ -44,6 +50,3 @@ app.use((err, req, res, next) => {
 http.listen(PORT, function(){
   console.log('listening on *:3000');
 });
-
-
-module.exports = app

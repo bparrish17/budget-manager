@@ -5,7 +5,7 @@
   "license": "Apache-2.0",
   "repository": "https://github.com/bparrish17/budget-manager",
   "scripts": {
-    "start": "nodemon server.js"
+    "start": "nodemon app.js"
   },
   "dependencies": {
     "4": "0.0.0",

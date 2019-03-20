@@ -1,0 +1,24 @@
+{
+  "name": "budget-manager",
+  "description": "Description here",
+  "version": "1.0.0",
+  "license": "Apache-2.0",
+  "repository": "https://github.com/bparrish17/budget-manager",
+  "scripts": {
+    "start": "nodemon server.js"
+  },
+  "dependencies": {
+    "4": "0.0.0",
+    "body-parser": "~1.13.2",
+    "express": "^4.13.4",
+    "express-handlebars": "^3.0.0",
+    "express-session": "^1.15.6",
+    "morgan": "^1.7.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.9.1"
+  },
+  "engines": {
+    "node": ">=4.5.0 <10"
+  }
+}

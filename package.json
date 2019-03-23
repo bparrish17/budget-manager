@@ -5,7 +5,7 @@
   "license": "Apache-2.0",
   "repository": "https://github.com/bparrish17/budget-manager",
   "scripts": {
-    "start": "nodemon app.js"
+    "start": "nodemon --inspect app.js"
   },
   "dependencies": {
     "4": "0.0.0",
@@ -13,6 +13,8 @@
     "express": "^4.13.4",
     "express-handlebars": "^3.0.0",
     "express-session": "^1.15.6",
+    "google-auth-library": "^3.1.1",
+    "googleapis": "^26.0.1",
     "morgan": "^1.7.0"
   },
   "devDependencies": {

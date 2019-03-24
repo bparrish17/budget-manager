@@ -10,11 +10,15 @@
   "dependencies": {
     "4": "0.0.0",
     "body-parser": "~1.13.2",
+    "csvtojson": "^2.0.8",
     "express": "^4.13.4",
     "express-handlebars": "^3.0.0",
     "express-session": "^1.15.6",
+    "formidable": "^1.2.1",
     "google-auth-library": "^3.1.1",
     "googleapis": "^26.0.1",
+    "lodash": "^4.17.11",
+    "moment": "^2.24.0",
     "morgan": "^1.7.0"
   },
   "devDependencies": {

@@ -5,6 +5,7 @@ const bodyParser = require('body-parser')
 const session = require('express-session')
 const PORT = process.env.PORT || 3000
 const app = express();
+const routes = require('./server/routes');
 const http = require('http').Server(app);
 
 module.exports = app
@@ -22,12 +23,14 @@ app.use(session({
   saveUninitialized: false
 }))
 // static file-serving middleware
-app.use(express.static(path.join(__dirname, './public')))
+app.use(express.static(path.join(__dirname, './client')))
 
-app.use('/api', require('./routes'));
+// api routes
+app.use('/api', routes);
 
+// public files
 app.use('*', (req, res) => {
-  res.sendFile(path.join(__dirname, './public/index.html'))
+  res.sendFile(path.join(__dirname, './client/index.html'))
 })
 
 

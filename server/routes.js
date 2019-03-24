@@ -1,7 +1,7 @@
 const router = require('express').Router()
 const formidable = require('formidable');
 const SheetsHelper = require('./sheets');
-const { convertCSVtoJSON, mapExpenses } = require('./data')
+const { convertCSVtoJSON, mapTransactions } = require('./data')
 const _ = require('lodash');
 const fs = require('fs');
 const csv = require('csvtojson');
@@ -11,24 +11,27 @@ const csv = require('csvtojson');
 router.post('/createSpreadsheet', (req, res) => {
 	const accessToken = req.session.data['access_token'];
 	const form = new formidable.IncomingForm();
+	
+	form.multiples = true;
 	form.parse(req);
 
+	let requests = [];
 	form.on('file', (name, file) => {
-		convertCSVtoJSON(file.path).then((jsonData) => {
-			const expenses = mapExpenses(jsonData);
-			res.send(expenses);
-		})
+		const noheader = name === 'usaa' ? true : false;
+		requests.push(
+			convertCSVtoJSON(file.path, noheader).then((jsonData) => mapTransactions(name, jsonData))
+		);
 	});
 
-	// const sheetsHelper = new SheetsHelper(accessToken);
-	// readCsvFile(file).then((csvData) => {
-	// 	console.log('csv data', csvData);
-	// 	res.send('success');
-	// }).catch((err) => res.error(err));
-
-	// sheetsHelper.createSpreadsheet(title, () => {
-	// 	res.send(`Spreadsheet "${title}" Created`);
-	// })
+	form.on('end', () => {
+		let result = [];
+		Promise.all(requests).then((fileData) => {
+			fileData.forEach((data) => {
+				if (data.length) result.push(data)
+			});
+			res.send(result);
+		})
+	})
 })
 
 router.get('/auth', (req, res) => {
@@ -47,14 +50,3 @@ router.use((req, res, next) => {
 })
 
 module.exports = router
-
-
-		// const stream = fs.createReadStream(file.path);
-		// const fileData = [];
-		// stream.on('data', (chunk) => {
-		// 	fileData.push(chunk);
-		// })
-
-		// stream.on('end', () => {
-		// 	res.send(fileData);
-		// })

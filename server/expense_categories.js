@@ -8,8 +8,7 @@ const GROCERIES = [
 ]
 
 const INTEREST = [
-	'Interest Charge on Purchases',
-
+	'INTEREST CHARGE ON PURCHASES',
 ]
 
 const PERSONAL = [
@@ -17,36 +16,41 @@ const PERSONAL = [
   'SI LAUNDROMAT & DRY CLEA',
   'HUDSON SQUARE PHARMACY',
   'WHISK',
-  'LEVI.COM'
+  'LEVI.COM',
+  'CLOTHING',
+  'APPAREL'
 ]
 
 const TRANSPORT = [
-  'METROCARD MACHINE NEW YORK NY'
+  'METROCARD MACHINE NEW YORK NY',
+  'METROCARD'
 ]
 
 const EATING_OUT = [
   'BAGEL ON THE SQUARE',
   'HAVE A BAGEL',
-  'Shake Shack',
+  'SHAKE SHACK',
   'RESTAURANT',
   'GRILL',
-  'COFFEE'
+  'COFFEE',
+  'SEAMLSS'
 ];
 
 const ALCOHOL = [
   'GRAIN & VINE',
-  'THE LATE LATE'
+  'THE LATE LATE',
+  'ALE'
 ]
 
 const UTILITIES = []
 const TRAVEL = ['DELTA AIR LINES']
-const ENTERTAINMENT = []
-const VENMO = [];
+const ENTERTAINMENT = ['SPOTIFY', 'SOFAR']
+const VENMO = ['VENMO'];
 const OTHER = [];
 const CASH_WITHDRAWAL = [];
 const RENT = [];
 
-const CATEGORIES = [
+const EXPENSE_CATEGORIES = [
 	'RENT',
 	'GROCERIES',
 	'EATING_OUT',
@@ -62,7 +66,7 @@ const CATEGORIES = [
 	'OTHER'
 ];
 
-const CATEGORY_MAP = {
+const EXPENSE_CATEGORY_MAP = {
   GROCERIES,
   INTEREST,
   PERSONAL,
@@ -78,4 +82,7 @@ const CATEGORY_MAP = {
   CASH_WITHDRAWAL
 }
 
-module.exports = { CATEGORIES, CATEGORY_MAP };
+module.exports = { 
+  EXPENSE_CATEGORIES,
+  EXPENSE_CATEGORY_MAP
+};

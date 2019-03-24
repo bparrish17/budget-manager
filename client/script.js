@@ -10,22 +10,30 @@ function onSignIn(user) {
 
 function addFormToDocument() {
   const form = document.getElementById('form-container');
-  // const titleInput = document.createElement('input')
-  // titleInput.type = 'text';
-  // titleInput.name = 'title'
 
-  const fileInput = document.createElement('input')
-  fileInput.type = 'file';
-  fileInput.name = 'file';
+  const amexInput = document.createElement('input')
+  amexInput.type = 'file';
+  amexInput.name = 'amex';
+
+  const usaaInput = document.createElement('input');
+  usaaInput.type = 'file';
+  usaaInput.name = 'usaa';
 
   const submitInput = document.createElement('input');
   submitInput.type = 'submit';
   submitInput.value = 'Submit';
 
   // form.appendChild(titleInput);
-  form.appendChild(fileInput);
+  form.appendChild(amexInput);
+  form.appendChild(usaaInput);
   form.appendChild(submitInput);
   
+  const inputs = [].slice.call(document.getElementsByTagName('input'));
+  inputs.forEach((input) => {
+    const newNode = document.createTextNode(input.name);
+    form.insertBefore(newNode, input);
+  })
+
 }
 
 /*************************************************

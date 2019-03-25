@@ -4,6 +4,10 @@ const moment = require("moment");
 const { EXPENSE_CATEGORY_MAP, EXPENSE_CATEGORIES } = require('./expense_categories');
 const { INCOME_CATEGORY_MAP, INCOME_CATEGORIES } = require('./income_categories');
 
+/*************************************************
+ * ASYNC OPERATIONS
+ *************************************************/
+
 const convertCSVtoJSON = function(path, noheader) {
   return new Promise((resolve, reject) => {
     const readStream = fs.createReadStream(path);
@@ -11,25 +15,67 @@ const convertCSVtoJSON = function(path, noheader) {
   });
 };
 
-const mapTransactions = function(type, data) {
+/*************************************************
+ * DATA MANIPULATION
+ *************************************************/
+
+const mapTransactions = function(type, startDate, endDate, data) {
 	return data.map(transaction => {
-		if (type === 'amex') return new AMEXTransaction(transaction);
-		else if (type === 'usaa') {
-			const fieldsToDelete = ['field1', 'field2', 'field4'];
-			fieldsToDelete.forEach((field) => delete transaction[field]);
-			if (Object.keys(transaction).length) return new USAATransaction(transaction);
-		}
+		let result;
+		if (type === 'amex') result = new AMEXTransaction(transaction);
+		else if (type === 'usaa') result = createUSAATransaction(transaction);
+		const isNull = !result || result === null || result === undefined;
+		const isOutsideDateParams = isNull || result.date < moment(startDate) || result.date > moment(endDate)
+		return (isNull || isOutsideDateParams) ? undefined : result; 
 	});
 };
 
+const createUSAATransaction = function(transaction) {
+	const fieldsToDelete = ['field1', 'field2', 'field4'];
+	fieldsToDelete.forEach((field) => delete transaction[field]);
+	if (Object.keys(transaction).length) {
+		return new USAATransaction(transaction);
+	}
+}
+
+function toTitleCase(str) {
+	return str.replace(/_/g, ' ').replace(/\w\S*/g, (txt) => {
+		return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+	}
+	);
+}
+
+function searchForCategory(name, categories, categoryMap) {
+	let result = categories.find((category) => {
+		const categoryItems = categoryMap[category]
+		return categoryItems.find((item) => {
+			if (item === name) return true;
+			else if (name.toUpperCase().includes(item)) return true;
+			else return false;
+		})
+	})
+	return result ? toTitleCase(result) : 'Other';
+}
+
+/*************************************************
+ * TRANSACTION CLASSES
+ *************************************************/
+
 class USAATransaction {
 	constructor(transaction) {
+		this.source = 'usaa';
 		this.date = moment(transaction['field3']);
 		this.displayDate = moment(transaction['field3']).format('MM/DD/YYYY');
 		this.name = this.setName(transaction['field5']);
-		this.category = this.setCategory(transaction['field5'] || '');
-		this.amount = Number(transaction['field7']);
-		this.type = this.amount < 0 ? 'expense' : 'income';
+		this.amount = this.setAmountAndType(transaction['field7']);
+
+		this.category = this.setCategory(this.name || '');
+	}
+
+	setAmountAndType(amt) {
+		let val = Number(amt);
+		this.type = val < 0 ? 'expense' : 'income';
+		return Math.abs(val); // always return positive value
 	}
 
 	setName(name) {
@@ -40,54 +86,26 @@ class USAATransaction {
 		const categories = this.type === 'expense' ? EXPENSE_CATEGORIES : INCOME_CATEGORIES;
 		const categoryMap = this.type === 'expense' ? EXPENSE_CATEGORY_MAP : INCOME_CATEGORY_MAP;
 
-		// LEFT OFF: find with USAA transactions getting a weird Item
-
-		const mappedCategory = categories.find((category) => {
-			const categoryItems = categoryMap[category]
-			return categoryItems.find((item) => {
-				console.log('name', name, item, name.toUpperCase().includes(item))
-				if (item === name) return true;
-				else if (name.toUpperCase().includes(item)) return true;
-				else return false;
-			})
-		})
-
-		return mappedCategory ? toTitleCase(mappedCategory) : 'Other';
+		return searchForCategory(name, categories, categoryMap);
 	}
 }
 
 class AMEXTransaction {
   constructor(transaction) {
+		this.source = 'amex'
     this.date = moment(transaction["Date"]);
     this.displayDate = moment(transaction["Date"]).format("MM/DD/YYYY");
     this.name = toTitleCase(transaction["Description"]);
-    this.amount = -Number(transaction["Amount"]);
+    this.amount = Number(transaction["Amount"])
 		this.category = this.setCategory(transaction["Description"]);
-		this.type = this.amount < 0 ? 'expense' : 'income';
-  }
+		this.type = 'expense';
+	}
 
   setCategory(name) {
-    const mappedCategory = EXPENSE_CATEGORIES.find((category) => {
-			const categoryItems = EXPENSE_CATEGORY_MAP[category]
-			return categoryItems.find((item) => {
-				if (item === name) return true;
-				else if (name.toUpperCase().includes(item)) return true;
-				else return false;
-			})
-		})
-
-		return mappedCategory ? toTitleCase(mappedCategory) : 'Other';
+		return searchForCategory(name, EXPENSE_CATEGORIES, EXPENSE_CATEGORY_MAP);
 	}
-	
-	
 }
 
-function toTitleCase(str) {
-	return str.replace(/_/g, ' ').replace(/\w\S*/g, (txt) => {
-		return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-	}
-	);
-}
 
 module.exports = {
   convertCSVtoJSON,

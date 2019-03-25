@@ -11,6 +11,16 @@ function onSignIn(user) {
 function addFormToDocument() {
   const form = document.getElementById('form-container');
 
+  const startDateInput = document.createElement('input');
+  startDateInput.type = 'date';
+  startDateInput.name = 'startDate'
+  startDateInput.value = '2019-02-16';
+
+  const endDateInput = document.createElement('input');
+  endDateInput.type = 'date';
+  endDateInput.name = 'endDate'
+  endDateInput.value = '2019-03-14';
+
   const amexInput = document.createElement('input')
   amexInput.type = 'file';
   amexInput.name = 'amex';
@@ -24,6 +34,8 @@ function addFormToDocument() {
   submitInput.value = 'Submit';
 
   // form.appendChild(titleInput);
+  form.appendChild(startDateInput);
+  form.appendChild(endDateInput);
   form.appendChild(amexInput);
   form.appendChild(usaaInput);
   form.appendChild(submitInput);

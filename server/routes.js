@@ -11,15 +11,23 @@ const csv = require('csvtojson');
 router.post('/createSpreadsheet', (req, res) => {
 	const accessToken = req.session.data['access_token'];
 	const form = new formidable.IncomingForm();
+	let startDate;
+	let endDate;
 	
 	form.multiples = true;
 	form.parse(req);
+
+	form.on('field', (name, value) => {
+		console.log('FIELD: ', name, value);
+		if (name === 'startDate') startDate = value;
+		if (name === 'endDate') endDate = value;
+	})
 
 	let requests = [];
 	form.on('file', (name, file) => {
 		const noheader = name === 'usaa' ? true : false;
 		requests.push(
-			convertCSVtoJSON(file.path, noheader).then((jsonData) => mapTransactions(name, jsonData))
+			convertCSVtoJSON(file.path, noheader).then((jsonData) => mapTransactions(name, startDate, endDate, jsonData))
 		);
 	});
 
@@ -27,7 +35,7 @@ router.post('/createSpreadsheet', (req, res) => {
 		let result = [];
 		Promise.all(requests).then((fileData) => {
 			fileData.forEach((data) => {
-				if (data.length) result.push(data)
+				if (data.length) result = [...result, ...data];
 			});
 			res.send(result);
 		})

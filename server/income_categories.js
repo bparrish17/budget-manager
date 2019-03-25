@@ -1,6 +1,6 @@
 const SAVINGS = [];
-const PAYCHECK = ['INSPERI', 'PAYROLL', 'DEPOSIT'];
-const BONUS = [];
+const PAYCHECK = ['INSPERI', 'PAYROLL'];
+const BONUS = ['DEPOSIT'];
 const INTEREST = [];
 const VENMO = ['VENMO'];
 const OTHER = [];

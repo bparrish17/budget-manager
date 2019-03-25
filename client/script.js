@@ -29,6 +29,10 @@ function addFormToDocument() {
   usaaInput.type = 'file';
   usaaInput.name = 'usaa';
 
+  const venmoInput = document.createElement('input');
+  venmoInput.type = 'file';
+  venmoInput.name = 'venmo';
+
   const submitInput = document.createElement('input');
   submitInput.type = 'submit';
   submitInput.value = 'Submit';
@@ -38,6 +42,7 @@ function addFormToDocument() {
   form.appendChild(endDateInput);
   form.appendChild(amexInput);
   form.appendChild(usaaInput);
+  form.appendChild(venmoInput);
   form.appendChild(submitInput);
   
   const inputs = [].slice.call(document.getElementsByTagName('input'));

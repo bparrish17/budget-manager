@@ -1,7 +1,7 @@
 const router = require('express').Router()
 const formidable = require('formidable');
 const SheetsHelper = require('./sheets');
-const { convertCSVtoJSON, mapTransactions } = require('./data')
+const { convertCSVtoJSON, mapTransactions, sortByDate } = require('./data')
 const _ = require('lodash');
 const fs = require('fs');
 const csv = require('csvtojson');
@@ -18,7 +18,6 @@ router.post('/createSpreadsheet', (req, res) => {
 	form.parse(req);
 
 	form.on('field', (name, value) => {
-		console.log('FIELD: ', name, value);
 		if (name === 'startDate') startDate = value;
 		if (name === 'endDate') endDate = value;
 	})
@@ -35,8 +34,13 @@ router.post('/createSpreadsheet', (req, res) => {
 		let result = [];
 		Promise.all(requests).then((fileData) => {
 			fileData.forEach((data) => {
-				if (data.length) result = [...result, ...data];
+				if (data.length) {
+					result = [...result, ...data];
+				}
 			});
+
+			result = sortByDate(result);
+
 			res.send(result);
 		})
 	})

@@ -22,13 +22,38 @@ const convertCSVtoJSON = function(path, noheader) {
 const mapTransactions = function(type, startDate, endDate, data) {
 	return data.map(transaction => {
 		let result;
-		if (type === 'amex') result = new AMEXTransaction(transaction);
-		else if (type === 'usaa') result = createUSAATransaction(transaction);
+		switch (type) {
+			case 'amex':
+				result = createAMEXTransaction(transaction);
+				break;
+			case 'usaa':
+				result = createUSAATransaction(transaction);
+				break;
+			case 'venmo':
+				result = createVenmoTransaction(transaction);
+				break;
+			default:
+				break;
+		}
 		const isNull = !result || result === null || result === undefined;
 		const isOutsideDateParams = isNull || result.date < moment(startDate) || result.date > moment(endDate)
-		return (isNull || isOutsideDateParams) ? undefined : result; 
+		return (isNull || isOutsideDateParams) ? null : result; 
 	});
 };
+
+const createAMEXTransaction = function(transaction) {
+	let amexTransaction = new AMEXTransaction(transaction);
+	return amexTransaction.amount > 0 ? amexTransaction : null;
+}
+
+const createVenmoTransaction = function(transaction) {
+	const fieldsToDelete = ['ID', 'Note', 'Amount (fee)'];
+	fieldsToDelete.forEach((field) => delete transaction[field]);
+	const usedVenmoBalance = transaction['Funding Source'] === 'Venmo balance';
+	const wasRecipient = transaction['Amount (total)'][0] === '+' && transaction['Destination'] === 'Venmo balance';
+	// allow only expenses from venmo, and only income into venmo
+	return usedVenmoBalance || wasRecipient ? new VenmoTransaction(transaction) : undefined;
+}
 
 const createUSAATransaction = function(transaction) {
 	const fieldsToDelete = ['field1', 'field2', 'field4'];
@@ -57,9 +82,50 @@ function searchForCategory(name, categories, categoryMap) {
 	return result ? toTitleCase(result) : 'Other';
 }
 
+function sortByDate(arr) {
+	return arr.filter((val) => !!val).sort((a, b) => {
+		let aDate = moment(a.date)
+		let bDate = moment(b.date);
+		return aDate.diff(bDate);
+	})
+}
+
 /*************************************************
  * TRANSACTION CLASSES
  *************************************************/
+
+class VenmoTransaction {
+	constructor(transaction) {
+		this.source = 'venmo';
+		this.date = moment(transaction['Datetime']);
+		this.displayDate = moment(transaction['Datetime']).format('MM/DD/YYYY');
+		this.name = this.setName(transaction['Type'], transaction['To'], transaction['From']);
+		this.amount = this.setAmount(transaction['Amount (total)']);
+		this.type = this.setType(transaction['Amount (total)'][0])
+		this.category = 'Venmo';
+	}
+
+	setType(plus) {
+		return plus === '+' ? 'income' : 'expense';
+	}
+
+	setAmount(amt) {
+		return Number(amt.split('$')[1]);
+	}
+
+	setName(type, to, frum) {
+		let name = `Venmo `;
+		if (type === 'Charge') {
+			if (this.type === 'expense') name += `to ${frum}`;
+			if (this.type === 'income')	name += `from ${to}`;
+		}
+		if (type === 'Payment') {
+			if (this.type === 'expense') name += `to ${to}`;
+			if (this.type === 'income') name += `from ${frum}`;
+		}
+		return name;
+	}
+}
 
 class USAATransaction {
 	constructor(transaction) {
@@ -67,15 +133,17 @@ class USAATransaction {
 		this.date = moment(transaction['field3']);
 		this.displayDate = moment(transaction['field3']).format('MM/DD/YYYY');
 		this.name = this.setName(transaction['field5']);
-		this.amount = this.setAmountAndType(transaction['field7']);
-
+		this.amount = this.setAmount(transaction['field7']);
+		this.type = this.setType(transaction['field7']);
 		this.category = this.setCategory(this.name || '');
 	}
 
-	setAmountAndType(amt) {
-		let val = Number(amt);
-		this.type = val < 0 ? 'expense' : 'income';
-		return Math.abs(val); // always return positive value
+	setAmount(amt) {
+		return Math.abs(Number(amt)); // always return positive value
+	}
+
+	setType(amt) {
+		return Number(amt) < 0 ? 'expense' : 'income';
 	}
 
 	setName(name) {
@@ -86,6 +154,7 @@ class USAATransaction {
 		const categories = this.type === 'expense' ? EXPENSE_CATEGORIES : INCOME_CATEGORIES;
 		const categoryMap = this.type === 'expense' ? EXPENSE_CATEGORY_MAP : INCOME_CATEGORY_MAP;
 
+		if (this.amount === 1400) return 'Rent';
 		return searchForCategory(name, categories, categoryMap);
 	}
 }
@@ -96,9 +165,17 @@ class AMEXTransaction {
     this.date = moment(transaction["Date"]);
     this.displayDate = moment(transaction["Date"]).format("MM/DD/YYYY");
     this.name = toTitleCase(transaction["Description"]);
-    this.amount = Number(transaction["Amount"])
+    this.amount = Number(transaction["Amount"]);
+		this.type = this.setType(transaction['Amount']);
 		this.category = this.setCategory(transaction["Description"]);
-		this.type = 'expense';
+	}
+
+	setAmount(amt) {
+		return Math.abs(Number(amt)); // always return positive value
+	}
+
+	setType(amt) {
+		return Number(amt) < 0 ? 'income' : 'expense';
 	}
 
   setCategory(name) {
@@ -109,7 +186,8 @@ class AMEXTransaction {
 
 module.exports = {
   convertCSVtoJSON,
-  mapTransactions
+	mapTransactions,
+	sortByDate
 };
 
 /*

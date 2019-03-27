@@ -1,10 +1,8 @@
 export const router = require('express').Router()
 const formidable = require('formidable');
-const { SheetsHelper } = require('./sheets.ts');
+import { SheetsHelper } from './sheets';
 import { convertCSVtoJSON, mapTransactions, sortByDate } from './data';
-const _ = require('lodash');
-const fs = require('fs');
-const csv = require('csvtojson');
+
 
 // additions
 
@@ -42,8 +40,16 @@ router.post('/createSpreadsheet', (req, res) => {
 			result = sortByDate(result);
 
 			// create sheets here
+			let sheetsHelper = new SheetsHelper(accessToken);
+			sheetsHelper.updateSpreadsheet(`Budget`, (spreadsheetRes) => {
+				console.log('res: ', spreadsheetRes);
+				res.send(spreadsheetRes);
+			})
 
-			res.send(result);
+			// sheetsHelper.getSpreadsheet((spreadsheetRes) => {
+			// 	console.log('res: ', spreadsheetRes);
+			// 	res.send(spreadsheetRes);
+			// })
 		})
 	})
 })

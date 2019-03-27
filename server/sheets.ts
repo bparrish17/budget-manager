@@ -11,27 +11,23 @@ export class SheetsHelper {
     this.service = google.sheets({version: 'v4', auth });
   }
 
-  createSpreadsheet(title, callback) {
-    const request = {
-      resource: {
-        properties: {
-          title: title
-        },
-        sheets: [
-          {
-            properties: {
-              title: 'Data',
-              gridProperties: {
-                columnCount: 6,
-                frozenRowCount: 1
-              }
-            }
-          },
-          // TODO: Add more sheets.
-        ]
+  updateSpreadsheet(title, callback) {
+    let addSheetRequest = {
+      properties: {
+        title
       }
+    }
+
+    let batchRequest = {
+      spreadsheetId: '1TuFlDkfwQU2galV5swbF3jeQhKmHb5I3AmO5D6oudOs',
+      resource: {
+        requests: [
+          { addSheet: addSheetRequest }
+        ],  // TODO: Update placeholder value.
+      },
     };
-    this.service.spreadsheets.create(request, (err, res) => {
+
+    this.service.spreadsheets.batchUpdate(batchRequest, (err, res) => {
       if (err) {
         return callback(err);
       }
@@ -41,4 +37,34 @@ export class SheetsHelper {
     })
   }
 
+
 }
+
+/*
+
+batchUpdate: 
+        // A list of updates to apply to the spreadsheet.
+        // Requests will be applied in the order they are specified.
+        // If any request is not valid, no requests will be applied.
+
+const request = {
+  resource: {
+    spreadsheetId: '1662177848',
+    properties: {
+      title: title
+    },
+    sheets: [
+      {
+        properties: {
+          title: 'Data 2',
+          gridProperties: {
+            columnCount: 6,
+            frozenRowCount: 1
+          }
+        }
+      },
+      // TODO: Add more sheets.
+    ]
+  }
+};
+*/

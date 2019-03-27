@@ -2,6 +2,7 @@ export const router = require('express').Router()
 const formidable = require('formidable');
 import { SheetsHelper } from './sheets';
 import { convertCSVtoJSON, mapTransactions, sortByDate } from './data';
+import * as moment from 'moment';
 
 
 // additions
@@ -11,13 +12,21 @@ router.post('/createSpreadsheet', (req, res) => {
 	const form = new formidable.IncomingForm();
 	let startDate;
 	let endDate;
+	let startMYY;
+	let endMYY;
 	
 	form.multiples = true;
 	form.parse(req);
 
 	form.on('field', (name, value) => {
-		if (name === 'startDate') startDate = value;
-		if (name === 'endDate') endDate = value;
+		if (name === 'startDate') {
+			startDate = value;
+			startMYY = moment(startDate).format('M/YY');
+		}
+		if (name === 'endDate') {
+			endDate = value;
+			endMYY = moment(endDate).format('M/YY');
+		}
 	})
 
 	let requests = [];
@@ -41,15 +50,19 @@ router.post('/createSpreadsheet', (req, res) => {
 
 			// create sheets here
 			let sheetsHelper = new SheetsHelper(accessToken);
-			sheetsHelper.updateSpreadsheet(`Budget`, (spreadsheetRes) => {
-				console.log('res: ', spreadsheetRes);
-				res.send(spreadsheetRes);
-			})
-
-			// sheetsHelper.getSpreadsheet((spreadsheetRes) => {
-			// 	console.log('res: ', spreadsheetRes);
+			// sheetsHelper.updateSpreadsheet(`${startMYY} - ${endMYY}`, (spreadsheetRes) => {
 			// 	res.send(spreadsheetRes);
 			// })
+			// sheetsHelper.updateSpreadsheet(`Test2`).then((spreadsheetRes) => {
+			// 	res.send(spreadsheetRes)
+			// })
+
+			sheetsHelper.updateSpreadsheetValues().then((spreadsheetRes) => {
+				res.send(spreadsheetRes)
+			})
+			.catch((err) => {
+				res.send(err);
+			})
 		})
 	})
 })

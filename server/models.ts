@@ -27,6 +27,19 @@ export type CatMap = { [key: string]: string[] };
  * GOOGLE SHEETS API
  *************************************************/
 
+export interface BatchUpdate {
+  spreadsheetId?: string | number;
+  valueInputOption: 'USER_ENTERED' | 'RAW';
+  includeValuesInResponse?: boolean;
+  data: ValueRange[]
+}
+
+export interface ValueRange {
+  range: string;
+  majorDimension: 'ROWS' | 'COLUMNS';
+  values: any[];
+}
+
 export interface SpreadSheet {
   properties: any,
   data: GridData[],

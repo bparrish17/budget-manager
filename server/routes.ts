@@ -1,7 +1,7 @@
-const router = require('express').Router()
+export const router = require('express').Router()
 const formidable = require('formidable');
-const SheetsHelper = require('./sheets');
-const { convertCSVtoJSON, mapTransactions, sortByDate } = require('./data')
+const { SheetsHelper } = require('./sheets.ts');
+import { convertCSVtoJSON, mapTransactions, sortByDate } from './data';
 const _ = require('lodash');
 const fs = require('fs');
 const csv = require('csvtojson');
@@ -41,6 +41,8 @@ router.post('/createSpreadsheet', (req, res) => {
 
 			result = sortByDate(result);
 
+			// create sheets here
+
 			res.send(result);
 		})
 	})
@@ -57,8 +59,5 @@ router.post('/auth', (req, res) => {
 
 router.use((req, res, next) => {
   const error = new Error('Not Found')
-  error.status = 404
   next(error)
 })
-
-module.exports = router

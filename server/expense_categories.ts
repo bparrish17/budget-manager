@@ -1,4 +1,6 @@
-const GROCERIES = [
+import { CatMap } from "./models";
+
+export const GROCERIES = [
 	'MARLOW & DAUGHTERS',
 	'MR PINA',
   'BROOKLYN HARVEST',
@@ -7,11 +9,11 @@ const GROCERIES = [
   'MET FOOD',
 ]
 
-const INTEREST = [
+export const INTEREST = [
 	'INTEREST CHARGE ON PURCHASES',
 ]
 
-const PERSONAL = [
+export const PERSONAL = [
   'WALGREENS',
   'SI LAUNDROMAT & DRY CLEA',
   'HUDSON SQUARE PHARMACY',
@@ -21,12 +23,12 @@ const PERSONAL = [
   'APPAREL'
 ]
 
-const TRANSPORT = [
+export const TRANSPORT = [
   'METROCARD MACHINE NEW YORK NY',
   'METROCARD'
 ]
 
-const EATING_OUT = [
+export const EATING_OUT = [
   'BAGEL ON THE SQUARE',
   'HAVE A BAGEL',
   'SHAKE SHACK',
@@ -36,21 +38,21 @@ const EATING_OUT = [
   'SEAMLSS'
 ];
 
-const ALCOHOL = [
+export const ALCOHOL = [
   'GRAIN & VINE',
   'THE LATE LATE',
   'ALE'
 ]
 
-const UTILITIES = []
-const TRAVEL = ['DELTA AIR LINES']
-const ENTERTAINMENT = ['SPOTIFY', 'SOFAR']
-const VENMO = ['VENMO'];
-const OTHER = [];
-const CASH_WITHDRAWAL = [];
-const RENT = [];
+export const UTILITIES = []
+export const TRAVEL = ['DELTA AIR LINES']
+export const ENTERTAINMENT = ['SPOTIFY', 'SOFAR']
+export const VENMO = ['VENMO'];
+export const OTHER = [];
+export const CASH_WITHDRAWAL = [];
+export const RENT = [];
 
-const EXPENSE_CATEGORIES = [
+export const EXPENSE_CATEGORIES = [
 	'RENT',
 	'GROCERIES',
 	'EATING_OUT',
@@ -66,7 +68,7 @@ const EXPENSE_CATEGORIES = [
 	'OTHER'
 ];
 
-const EXPENSE_CATEGORY_MAP = {
+export const EXPENSE_CATEGORY_MAP: CatMap = {
   GROCERIES,
   INTEREST,
   PERSONAL,
@@ -81,8 +83,3 @@ const EXPENSE_CATEGORY_MAP = {
   OTHER,
   CASH_WITHDRAWAL
 }
-
-module.exports = { 
-  EXPENSE_CATEGORIES,
-  EXPENSE_CATEGORY_MAP
-};

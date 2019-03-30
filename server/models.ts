@@ -1,4 +1,5 @@
 import { Moment } from "moment";
+import { Row } from "./row";
 
 /*************************************************
  * INTERNAL 
@@ -31,13 +32,7 @@ export interface BatchUpdate {
   spreadsheetId?: string | number;
   valueInputOption: 'USER_ENTERED' | 'RAW';
   includeValuesInResponse?: boolean;
-  data: ValueRange[]
-}
-
-export interface ValueRange {
-  range: string;
-  majorDimension: 'ROWS' | 'COLUMNS';
-  values: any[];
+  data: any[]
 }
 
 export interface SpreadSheet {

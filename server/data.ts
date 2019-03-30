@@ -2,7 +2,7 @@ const fs = require("fs");
 const csv = require("csvtojson");
 const moment = require("moment");
 
-import { AMEXTransaction, VenmoTransaction, USAATransaction } from './transaction_classes';
+import { AMEXTransaction, VenmoTransaction, USAATransaction } from './transaction';
 
 
 export function convertCSVtoJSON(path, noheader): Promise<any> {
@@ -61,7 +61,7 @@ export function createUSAATransaction(transaction): USAATransaction {
 }
 
 export function sortByDate(arr) {
-	return arr.filter((val) => !!val).sort((a, b) => {
+	return arr.sort((a, b) => {
 		let aDate = moment(a.date)
 		let bDate = moment(b.date);
 		return aDate.diff(bDate);

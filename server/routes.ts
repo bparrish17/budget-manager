@@ -3,6 +3,7 @@ const formidable = require('formidable');
 import { SheetsHelper } from './sheets';
 import { convertCSVtoJSON, mapTransactions, sortByDate } from './data';
 import * as moment from 'moment';
+import { resolve } from 'dns';
 
 
 // additions
@@ -29,6 +30,9 @@ router.post('/createSpreadsheet', (req, res) => {
 		}
 	})
 
+	// const sheetName = `Budget (${startMYY} - ${endMYY})`
+	const sheetName = 'Budget';
+
 	let requests = [];
 	form.on('file', (name, file) => {
 		const noheader = name === 'usaa' ? true : false;
@@ -42,27 +46,29 @@ router.post('/createSpreadsheet', (req, res) => {
 		Promise.all(requests).then((fileData) => {
 			fileData.forEach((data) => {
 				if (data.length) {
-					result = [...result, ...data];
+					result = [...result, ...data].filter((val) => !!val);
 				}
 			});
 
-			result = sortByDate(result);
+			// result = sortByDate(result);
 
 			// create sheets here
-			let sheetsHelper = new SheetsHelper(accessToken);
-			// sheetsHelper.updateSpreadsheet(`${startMYY} - ${endMYY}`, (spreadsheetRes) => {
+			let sheetsHelper = new SheetsHelper(accessToken, sheetName);
+			// sheetsHelper.updateSpreadsheet(sheetName, (spreadsheetRes) => {
 			// 	res.send(spreadsheetRes);
 			// })
 			// sheetsHelper.updateSpreadsheet(`Test2`).then((spreadsheetRes) => {
 			// 	res.send(spreadsheetRes)
 			// })
 
-			sheetsHelper.updateSpreadsheetValues().then((spreadsheetRes) => {
+			sheetsHelper.updateSpreadsheetValues(result).then((spreadsheetRes) => {
 				res.send(spreadsheetRes)
 			})
 			.catch((err) => {
-				res.send(err);
+				res.send('ERROR UPDATING SPREADSHEET VALS', err);
 			})
+		}).catch((err) => {
+			res.send('ERROR AT CONVERSION PROMISE', err);
 		})
 	})
 })

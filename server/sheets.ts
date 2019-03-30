@@ -10,14 +10,14 @@ export class SheetsHelper {
   public service: any;
   public sheet: string;
 
-  constructor(accessToken, sheet) {
+  constructor(accessToken) {
     const auth = new OAuth2Client();
     auth.credentials = { access_token: accessToken };
     this.service = google.sheets({version: 'v4', auth });
-    this.sheet = sheet;
   }
 
   updateSpreadsheet(title) {
+    this.sheet = title;
     const addSheetRequest = this._addSheet(title)
 
     const batchRequest = {
@@ -42,29 +42,15 @@ export class SheetsHelper {
   updateSpreadsheetValues(transactionData: Transaction[]) {
     const batchRequest: BatchUpdate = {
       spreadsheetId: '1TuFlDkfwQU2galV5swbF3jeQhKmHb5I3AmO5D6oudOs',
-      valueInputOption: 'RAW',
       includeValuesInResponse: true,
-      data: [{
-        majorDimension: 'COLUMNS',
-        range: 'Budget!A1',
-        values: [
-          [123]
-        ] 
-      }]
+      resource: {
+        valueInputOption: 'USER_ENTERED',
+        data: this._constructTables(transactionData)
+      }
     }
-
-    //      data: this._constructTables(transactionData).slice(0, 10)
-
-    // return new Promise((resolve, reject) => {
-    //   console.log('REQUEST: ', batchRequest);
-    //   resolve(batchRequest);
-    // })
-
 
     return new Promise((resolve, reject) => {
       this.service.spreadsheets.values.batchUpdate(batchRequest, (err, res) => {
-        console.log('ERR', err);
-        console.log('RES', res);
         if (err) {
           reject(err);
         }

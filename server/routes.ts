@@ -15,23 +15,26 @@ router.post('/createSpreadsheet', (req, res) => {
 	let endDate;
 	let startMYY;
 	let endMYY;
+	let sheetName = 'Budget';
 	
 	form.multiples = true;
 	form.parse(req);
 
 	form.on('field', (name, value) => {
+		console.log('name', name, value);
 		if (name === 'startDate') {
 			startDate = value;
 			startMYY = moment(startDate).format('M/YY');
+			sheetName += ` (${startMYY}`;
 		}
 		if (name === 'endDate') {
 			endDate = value;
 			endMYY = moment(endDate).format('M/YY');
+			sheetName += ` - ${endMYY})`
 		}
 	})
 
-	// const sheetName = `Budget (${startMYY} - ${endMYY})`
-	const sheetName = 'Budget';
+	const sheetsHelper = new SheetsHelper(accessToken);
 
 	let requests = [];
 	form.on('file', (name, file) => {
@@ -52,21 +55,12 @@ router.post('/createSpreadsheet', (req, res) => {
 
 			// result = sortByDate(result);
 
-			// create sheets here
-			let sheetsHelper = new SheetsHelper(accessToken, sheetName);
-			// sheetsHelper.updateSpreadsheet(sheetName, (spreadsheetRes) => {
-			// 	res.send(spreadsheetRes);
-			// })
-			// sheetsHelper.updateSpreadsheet(`Test2`).then((spreadsheetRes) => {
-			// 	res.send(spreadsheetRes)
-			// })
-
-			sheetsHelper.updateSpreadsheetValues(result).then((spreadsheetRes) => {
-				res.send(spreadsheetRes)
-			})
-			.catch((err) => {
-				res.send('ERROR UPDATING SPREADSHEET VALS', err);
-			})
+			sheetsHelper.updateSpreadsheet(sheetName)
+				.then(() => sheetsHelper.updateSpreadsheetValues(result))
+				.then((spreadsheetVals) => res.send(spreadsheetVals))
+				.catch((err) => {
+					res.send('ERROR UPDATING SPREADSHEET VALS', err);
+				})
 		}).catch((err) => {
 			res.send('ERROR AT CONVERSION PROMISE', err);
 		})

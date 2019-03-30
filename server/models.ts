@@ -30,9 +30,11 @@ export type CatMap = { [key: string]: string[] };
 
 export interface BatchUpdate {
   spreadsheetId?: string | number;
-  valueInputOption: 'USER_ENTERED' | 'RAW';
   includeValuesInResponse?: boolean;
-  data: any[]
+  resource: {
+    valueInputOption: 'USER_ENTERED' | 'RAW';
+    data: any[]
+  }
 }
 
 export interface SpreadSheet {

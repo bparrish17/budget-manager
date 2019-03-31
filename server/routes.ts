@@ -21,7 +21,6 @@ router.post('/createSpreadsheet', (req, res) => {
 	form.parse(req);
 
 	form.on('field', (name, value) => {
-		console.log('name', name, value);
 		if (name === 'startDate') {
 			startDate = value;
 			startMYY = moment(startDate).format('M/YY');

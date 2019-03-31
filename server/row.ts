@@ -1,19 +1,12 @@
-import { Transaction } from "./models";
-
-/*
-{
-          majorDimension: 'ROWS',
-          range: 'A1:B1',
-          values: [[1.55]]
-        }
-**/
+import { Transaction } from "./transaction";
+import { EXPENSE_AMOUNT_COL, INCOME_AMOUNT_COL } from "./constants";
 
 export class Row {
   public majorDimension = 'COLUMNS';
   public range: string;
   public values: any;
 
-  constructor(type, sheet, row) {
+  constructor(type, sheet, row, col?) {
     this.range = this.setRange(type, sheet, row);
   }
 
@@ -51,5 +44,16 @@ export class DataRow extends Row {
     const { displayDate: date, amount, name: description, category } = transaction;
     console.log(date, amount, description, category);
     return [[date], [amount], [description], [category]]
+  }
+}
+
+export class CalculationRow extends Row {
+  public values: any;
+
+  constructor(type, sheet, row) {
+    super(type, sheet, row);
+    const col = type === 'expense' ? EXPENSE_AMOUNT_COL: INCOME_AMOUNT_COL;
+    this.range = `${sheet}!${col}${row}`
+    this.values = [[`=SUM(${col}2:${col}${row - 1})`]];
   }
 }

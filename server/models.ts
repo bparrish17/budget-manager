@@ -10,18 +10,6 @@ export interface TEST {
   world: string;
 }
 
-export class Transaction {
-  public source: string;
-	public date: Moment | string;
-	public displayDate: string;
-	public name: string;
-	public amount: number;
-	public type: TransactionType;
-	public category: any;
-}
-
-export type TransactionType = 'income' | 'expense';
-
 export type CatMap = { [key: string]: string[] };
 
 /*************************************************

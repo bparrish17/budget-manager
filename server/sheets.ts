@@ -1,6 +1,7 @@
-import { BatchUpdate, Transaction } from "./models";
-import { Row, HeaderRow, DataRow } from "./row";
+import { BatchUpdate } from "./models";
+import { Row, HeaderRow, DataRow, CalculationRow } from "./row";
 import { sortByDate } from "./data";
+import { Transaction } from "./transaction";
 
 const { google } = require('googleapis');
 const { OAuth2Client } = require('google-auth-library');
@@ -71,46 +72,32 @@ export class SheetsHelper {
   }
 
   private _constructTables(transactionData: Transaction[]): Row[] {
-    console.log('here');
     const headers = ['Date', 'Amount', 'Description', 'Category']
-    console.log('headers', headers);
-    let expenseHeaderRow: HeaderRow = new HeaderRow('expense', this.sheet, 1, headers);
-    let incomeHeaderRow: HeaderRow = new HeaderRow('income', this.sheet, 1, headers);
-    let incomeRows: Row[] = [];
+    let result = [];
 
-    let dataRows = sortByDate(transactionData).map((trs, idx) => {
-      // console.log(`${idx}: `, trs.name);
-      return new DataRow(trs.type, this.sheet, idx+2, trs)
-    })
-    return [expenseHeaderRow, incomeHeaderRow, ...dataRows];
+    const expenseHeaderRow: HeaderRow = new HeaderRow('expense', this.sheet, 1, headers);
+    const expenses = sortByDate(transactionData.filter((trs) => trs.type === 'expense'));
+    const expenseRows = expenses.map((trs, idx) => new DataRow(trs.type, this.sheet, idx+2, trs));
+
+    const incomeHeaderRow: HeaderRow = new HeaderRow('income', this.sheet, 1, headers);
+    const incomes = sortByDate(transactionData.filter((trs) => trs.type === 'income'));
+    const incomeRows = incomes.map((trs, idx) => new DataRow(trs.type, this.sheet, idx+2, trs));
+
+    result = [
+      expenseHeaderRow,
+      incomeHeaderRow,
+      ...expenseRows,
+      ...incomeRows
+    ];
+
+    if (expenseRows.length > 0) {
+      result.push(new CalculationRow('expense', this.sheet, expenseRows.length+2));
+    }
+
+    if (incomeRows.length > 0) {
+      result.push(new CalculationRow('income', this.sheet, incomeRows.length+2));
+    }
+    
+    return result;
   }
 }
-
-/*
-
-batchUpdate: 
-        // A list of updates to apply to the spreadsheet.
-        // Requests will be applied in the order they are specified.
-        // If any request is not valid, no requests will be applied.
-
-const request = {
-  resource: {
-    spreadsheetId: '1662177848',
-    properties: {
-      title: title
-    },
-    sheets: [
-      {
-        properties: {
-          title: 'Data 2',
-          gridProperties: {
-            columnCount: 6,
-            frozenRowCount: 1
-          }
-        }
-      },
-      // TODO: Add more sheets.
-    ]
-  }
-};
-*/

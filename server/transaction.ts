@@ -1,7 +1,20 @@
-import { Transaction, CatMap } from "./models";
+import { CatMap } from "./models";
 import { EXPENSE_CATEGORIES, EXPENSE_CATEGORY_MAP } from "./expense_categories";
 import { INCOME_CATEGORIES, INCOME_CATEGORY_MAP } from "./income_categories";
 import * as moment from 'moment';
+import { Moment } from "moment";
+
+export class Transaction {
+  public source: string;
+	public date: Moment | string;
+	public displayDate: string;
+	public name: string;
+	public amount: number | string;
+	public type: TransactionType;
+	public category: any;
+}
+
+export type TransactionType = 'income' | 'expense';
 
 export class VenmoTransaction extends Transaction {
 	constructor(transaction) {

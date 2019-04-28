@@ -1,7 +1,8 @@
 import { BatchUpdate } from "./models";
-import { Row, HeaderRow, DataRow, CalculationRow } from "./row";
+import { Row, HeaderRow, DataRow, CalculationRow, TitleRow } from "./row";
 import { sortByDate } from "./data";
 import { Transaction } from "./transaction";
+import { TITLE_ROW_IDX, HEADER_ROW_IDX, DATA_ROW_START_IDX, TEST_SHEET_ID } from "./constants";
 
 const { google } = require('googleapis');
 const { OAuth2Client } = require('google-auth-library');
@@ -22,7 +23,7 @@ export class SheetsHelper {
     const addSheetRequest = this._addSheet(title)
 
     const batchRequest = {
-      spreadsheetId: '1TuFlDkfwQU2galV5swbF3jeQhKmHb5I3AmO5D6oudOs',
+      spreadsheetId: TEST_SHEET_ID,
       resource: {
         requests: [
           { addSheet: addSheetRequest }
@@ -33,6 +34,7 @@ export class SheetsHelper {
     return new Promise((resolve, reject) => {
       this.service.spreadsheets.batchUpdate(batchRequest, (err, res) => {
         if (err) reject(err);
+        console.log('res. data', res)
         var spreadsheet = res.data;
         // TODO: Add header rows.
         resolve(spreadsheet);
@@ -42,7 +44,7 @@ export class SheetsHelper {
 
   updateSpreadsheetValues(transactionData: Transaction[]) {
     const batchRequest: BatchUpdate = {
-      spreadsheetId: '1TuFlDkfwQU2galV5swbF3jeQhKmHb5I3AmO5D6oudOs',
+      spreadsheetId: TEST_SHEET_ID,
       includeValuesInResponse: true,
       resource: {
         valueInputOption: 'USER_ENTERED',
@@ -52,6 +54,7 @@ export class SheetsHelper {
 
     return new Promise((resolve, reject) => {
       this.service.spreadsheets.values.batchUpdate(batchRequest, (err, res) => {
+        console.log('ERR: ', err, 'RES: ', res);
         if (err) {
           reject(err);
         }
@@ -75,28 +78,43 @@ export class SheetsHelper {
     const headers = ['Date', 'Amount', 'Description', 'Category']
     let result = [];
 
-    const expenseHeaderRow: HeaderRow = new HeaderRow('expense', this.sheet, 1, headers);
-    const expenses = sortByDate(transactionData.filter((trs) => trs.type === 'expense'));
-    const expenseRows = expenses.map((trs, idx) => new DataRow(trs.type, this.sheet, idx+2, trs));
+    console.log('expenses')
 
-    const incomeHeaderRow: HeaderRow = new HeaderRow('income', this.sheet, 1, headers);
+    const expenseTitleRow = new TitleRow('expense', this.sheet, TITLE_ROW_IDX, 'Expenses')
+    const expenseHeaderRow = new HeaderRow('expense', this.sheet, HEADER_ROW_IDX, headers);
+    const expenses = sortByDate(transactionData.filter((trs) => trs.type === 'expense'));
+    const expenseRows = expenses.map((trs, idx) => new DataRow(trs.type, this.sheet, idx + 3, trs));
+
+    console.log('income')
+
+    const incomeTitleRow = new TitleRow('income', this.sheet, TITLE_ROW_IDX, 'Income')
+    const incomeHeaderRow = new HeaderRow('income', this.sheet, HEADER_ROW_IDX, headers);
     const incomes = sortByDate(transactionData.filter((trs) => trs.type === 'income'));
-    const incomeRows = incomes.map((trs, idx) => new DataRow(trs.type, this.sheet, idx+2, trs));
+    const incomeRows = incomes.map((trs, idx) => new DataRow(trs.type, this.sheet, idx + 3, trs));
+
+    const totalTitleRow = new TitleRow('total', this.sheet, TITLE_ROW_IDX, 'Totals')
+    const totalHeaderRow = new HeaderRow('total', this.sheet, HEADER_ROW_IDX, ['Expenses', 'Income']);
 
     result = [
+      expenseTitleRow,
       expenseHeaderRow,
+      incomeTitleRow,
       incomeHeaderRow,
+      totalTitleRow,
+      totalHeaderRow,
       ...expenseRows,
       ...incomeRows
     ];
 
-    if (expenseRows.length > 0) {
-      result.push(new CalculationRow('expense', this.sheet, expenseRows.length+2));
-    }
+    // if (expenseRows.length > 0) {
+    //   result.push(new CalculationRow('expense', this.sheet, expenseRows.length+2));
+    // }
 
-    if (incomeRows.length > 0) {
-      result.push(new CalculationRow('income', this.sheet, incomeRows.length+2));
-    }
+    // if (incomeRows.length > 0) {
+    //   result.push(new CalculationRow('income', this.sheet, incomeRows.length+2));
+    // }
+
+    console.log('result', result);
     
     return result;
   }

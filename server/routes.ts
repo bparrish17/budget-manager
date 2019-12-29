@@ -33,7 +33,7 @@ router.post('/updateSpreadsheet', (req, res) => {
 				}
 			});
 
-			sheetsHelper.updateSpreadsheetValues(result)
+			sheetsHelper.appendValues(result)
 				.then((spreadsheetVals) => {
 					if (spreadsheetVals) {
 						res.send('Successfully Added Transactions!')

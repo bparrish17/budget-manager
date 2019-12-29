@@ -25,6 +25,17 @@ export interface BatchUpdate {
   }
 }
 
+export interface Append {
+  spreadsheetId?: string | number;
+  range: string;
+  insertDataOption: 'INSERT_ROWS' | 'OVERWRITE',
+  includeValuesInResponse?: boolean;
+  valueInputOption: 'USER_ENTERED' | 'RAW';
+  resource: {
+    values: any[]
+  }
+}
+
 export interface SpreadSheet {
   properties: any,
   data: GridData[],

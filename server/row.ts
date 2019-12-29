@@ -45,7 +45,7 @@ export class Row {
     // const colStart = type === 'expense' ? 'A' : 'E';
     // const colEnd = type === 'expense' ? 'D' : 'H';
     console.log(`${sheet}!${colStart}${row}:${colEnd}${row}`);
-    return `${sheet}!${colStart}${row}:${colEnd}${row}`;
+    return `${colStart}${row}:${colEnd}${row}`;
   }
 }
 

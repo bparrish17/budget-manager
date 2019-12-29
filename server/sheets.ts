@@ -1,8 +1,8 @@
-import { BatchUpdate } from "./models";
+import { BatchUpdate, Append } from "./models";
 import { Row, HeaderRow, DataRow, CalculationRow, TitleRow } from "./row";
 import { sortByDate } from "./data";
 import { Transaction } from "./transaction";
-import { TITLE_ROW_IDX, HEADER_ROW_IDX, DATA_ROW_START_IDX, TEST_SHEET_ID, SHEET_ID } from "./constants";
+import { TITLE_ROW_IDX, HEADER_ROW_IDX, DATA_ROW_START_IDX, NEW_SHEET_ID, SHEET_ID } from "./constants";
 
 const { google } = require('googleapis');
 const { OAuth2Client } = require('google-auth-library');
@@ -42,10 +42,36 @@ export class SheetsHelper {
     })
   }
 
+  appendValues(transactionData: Transaction[]) {
+    const request: Append = {
+      spreadsheetId: NEW_SHEET_ID,
+      insertDataOption: 'INSERT_ROWS',
+      range: 'Transactions!A1',
+      valueInputOption: 'USER_ENTERED',
+      resource: {
+        values: this._getTransactionValues(transactionData)
+      }
+    }
+
+    console.log('REQUEST: ', request);
+    return new Promise((resolve, reject) => {
+      this.service.spreadsheets.values.append(request, (err, res) => {
+        console.log('ERR: ', err, 'RES: ', res);
+        if (err) {
+          reject(err);
+        }
+        var spreadsheet = res.data;
+        // TODO: Add header rows.
+        resolve(spreadsheet);
+      })
+    })
+
+  }
+
   updateSpreadsheetValues(transactionData: Transaction[]) {
     console.log('TRANSACTION DATA', transactionData)
     const batchRequest: BatchUpdate = {
-      spreadsheetId: SHEET_ID,
+      spreadsheetId: NEW_SHEET_ID,
       includeValuesInResponse: true,
       resource: {
         valueInputOption: 'USER_ENTERED',
@@ -73,6 +99,14 @@ export class SheetsHelper {
         title
       }
     }
+  }
+
+  private _getTransactionValues(transactionData: Transaction[]) {
+    return transactionData.map((transaction: Transaction) => {
+      const { displayDate: date, amount, name: description, category } = transaction;
+      console.log(date, amount, description, category);
+      return [date, amount, description, category]
+    })
   }
 
   private _constructTables(transactionData: Transaction[]): Row[] {

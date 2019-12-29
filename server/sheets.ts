@@ -28,7 +28,7 @@ export class SheetsHelper {
     });
     const incomesRequest = this._getLastColumnIndex('incomes').then((colIdx: string) => {
       console.log('colIdx', colIdx);
-      return this._getAppendValuesRequest(expenses, colIdx);
+      return this._getAppendValuesRequest(incomes, colIdx);
     });
     return Promise.all([expensesRequest, incomesRequest]);
   }

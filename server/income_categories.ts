@@ -1,7 +1,7 @@
 import { CatMap } from "./models";
 
 export const SAVINGS = [];
-export const PAYCHECK = ['INSPERI', 'PAYROLL'];
+export const PAYCHECK = ['INSPERI', 'PAYROLL', 'ICIMS'];
 export const BONUS = ['DEPOSIT'];
 export const INTEREST = [];
 export const VENMO = ['VENMO'];

@@ -20,7 +20,13 @@ export const PERSONAL = [
   'WHISK',
   'LEVI.COM',
   'CLOTHING',
-  'APPAREL'
+  'APPAREL',
+  'NINTENDO',
+  'LAUNDROMAT',
+  'LEVI',
+  'CALVINKLEIN',
+  'REDBUBBLE',
+  'PLAYSTATION'
 ]
 
 export const TRANSPORT = [
@@ -35,7 +41,15 @@ export const EATING_OUT = [
   'RESTAURANT',
   'GRILL',
   'COFFEE',
-  'SEAMLSS'
+  'SEAMLSS',
+  'CAFE',
+  'GRUBHUB',
+  'SEAMLESS',
+  'SALAD',
+  'KABOB',
+  'CAVIAR',
+  'POSTMATE',
+  'COOKIE'
 ];
 
 export const ALCOHOL = [

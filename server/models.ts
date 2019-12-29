@@ -1,20 +1,5 @@
-import { Moment } from "moment";
-import { Row } from "./row";
-
-/*************************************************
- * INTERNAL 
- *************************************************/
-
-export interface TEST {
-  hello: string;
-  world: string;
-}
 
 export type CatMap = { [key: string]: string[] };
-
-/*************************************************
- * GOOGLE SHEETS API
- *************************************************/
 
 export interface BatchUpdate {
   spreadsheetId?: string | number;

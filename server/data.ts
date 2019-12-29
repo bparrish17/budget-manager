@@ -5,7 +5,7 @@ const moment = require("moment");
 import { AMEXTransaction, VenmoTransaction, USAATransaction } from './transaction';
 
 export function convertFileDataToJSON(accountName, file, noheader) {
-	return convertCSVtoJSON(file.path, noheader).then((jsonData) => newMapTransactions(accountName, jsonData))
+	return convertCSVtoJSON(file.path, noheader).then((jsonData) => mapTransactions(accountName, jsonData))
 }
 
 export function convertCSVtoJSON(path, noheader): Promise<any> {
@@ -19,7 +19,7 @@ export function convertCSVtoJSON(path, noheader): Promise<any> {
  * DATA MANIPULATION
  *************************************************/
 
-function newMapTransactions(type, data) {
+function mapTransactions(type, data) {
 	return data.map((transaction) => {
 		switch (type) {
 			case 'amex':
@@ -29,32 +29,10 @@ function newMapTransactions(type, data) {
 			case 'venmo':
 				return createVenmoTransaction(transaction);
 			default:
-				break;
+				return null;
 		}
 	});
 }
-
-export function mapTransactions(type, startDate, endDate, data) {
-	return data.map(transaction => {
-		let result;
-		switch (type) {
-			case 'amex':
-				result = createAMEXTransaction(transaction);
-				break;
-			case 'usaa':
-				result = createUSAATransaction(transaction);
-				break;
-			case 'venmo':
-				result = createVenmoTransaction(transaction);
-				break;
-			default:
-				break;
-		}
-		const isNull = !result || result === null || result === undefined;
-		const isOutsideDateParams = isNull || result.date < moment(startDate) || result.date > moment(endDate)
-		return (isNull || isOutsideDateParams) ? null : result; 
-	});
-};
 
 function createAMEXTransaction(transaction): AMEXTransaction {
 	let amexTransaction = new AMEXTransaction(transaction);
@@ -74,7 +52,10 @@ function createUSAATransaction(transaction): USAATransaction {
 	const fieldsToDelete = ['field1', 'field2', 'field4'];
 	fieldsToDelete.forEach((field) => delete transaction[field]);
 	if (Object.keys(transaction).length) {
-		return new USAATransaction(transaction);
+		const usaaTransaction = new USAATransaction(transaction);
+		if (usaaTransaction.name.toLowerCase().includes('amex epayment')) return null;
+		if (usaaTransaction.name.toLowerCase().includes('usaa funds transfer')) return null;
+		return usaaTransaction;
 	}
 }
 

@@ -1,8 +1,8 @@
 // SHEET
 
 export const TEST_SHEET_ID = '1iRHLWOk7E_SPFO_n6Ok0xci__SUtApQGhseuOzz0ThI';
-export const SHEET_ID = '1TuFlDkfwQU2galV5swbF3jeQhKmHb5I3AmO5D6oudOs';
-export const NEW_SHEET_ID = '1Kwlz2FG-nuHyQM0ieNsUZUfKTpq06OM-wnWcc3LT4Ko';
+// export const SHEET_ID = '1TuFlDkfwQU2galV5swbF3jeQhKmHb5I3AmO5D6oudOs';
+export const SHEET_ID = '1Kwlz2FG-nuHyQM0ieNsUZUfKTpq06OM-wnWcc3LT4Ko';
 
 // COLUMNS
 

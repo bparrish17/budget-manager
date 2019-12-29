@@ -5,52 +5,43 @@
 
 function onSignIn(user) {
   const authData = user.getAuthResponse()
-  storeAuthData(authData)
+  this.storeAuthData(authData)
+    .then((res) => res.json())
+    .then((data) => {
+      if (data) {
+        newAddFormToDocument();
+      }
+    })
+    .catch((err) => (console.log('Fetch Error', err)));
 }
 
-function addFormToDocument() {
+function newAddFormToDocument() {
   const form = document.getElementById('form-container');
 
-  const startDateInput = document.createElement('input');
-  startDateInput.type = 'date';
-  startDateInput.name = 'startDate'
-  startDateInput.value = '2019-02-16';
-
-  const endDateInput = document.createElement('input');
-  endDateInput.type = 'date';
-  endDateInput.name = 'endDate'
-  endDateInput.value = '2019-03-14';
-
+  // Amex Input
   const amexInput = document.createElement('input')
+  const amexLabel = document.createElement('div')
   amexInput.type = 'file';
   amexInput.name = 'amex';
+  amexLabel.innerText = 'American Express';
 
+  // USAA input
   const usaaInput = document.createElement('input');
+  const usaaLabel = document.createElement('div');
   usaaInput.type = 'file';
   usaaInput.name = 'usaa';
+  usaaLabel.innerText = 'USAA';
 
-  const venmoInput = document.createElement('input');
-  venmoInput.type = 'file';
-  venmoInput.name = 'venmo';
-
+  // Submit Button
   const submitInput = document.createElement('input');
   submitInput.type = 'submit';
   submitInput.value = 'Submit';
 
-  // form.appendChild(titleInput);
-  form.appendChild(startDateInput);
-  form.appendChild(endDateInput);
+  form.appendChild(amexLabel);
   form.appendChild(amexInput);
+  form.appendChild(usaaLabel);
   form.appendChild(usaaInput);
-  form.appendChild(venmoInput);
   form.appendChild(submitInput);
-  
-  const inputs = [].slice.call(document.getElementsByTagName('input'));
-  inputs.forEach((input) => {
-    const newNode = document.createTextNode(input.name);
-    form.insertBefore(newNode, input);
-  })
-
 }
 
 /*************************************************
@@ -58,19 +49,24 @@ function addFormToDocument() {
  *************************************************/
 
 function storeAuthData(data) {
-  fetch('/api/auth', { 
+  return fetch('/api/auth', { 
     method: 'post',
     headers: { "Content-type": "application/json; charset=UTF-8" },
     body: JSON.stringify(data)
   })
+}
+
+function updateSpreadsheet(accessToken, title) {
+  fetch('/api/updateSpreadsheet', { 
+    method: 'post',
+    headers: { "Content-type": "application/json; charset=UTF-8" },
+    body: JSON.stringify({ accessToken, title })
+  })
   .then((res) => {
     res.json().then((data) => {
-      if (data) {
-        addFormToDocument();
-      }
+      console.log('data', data);
     })
   })
-  .catch((err) => (console.log('Fetch Error', err)));
 }
 
 function createSpreadSheet(accessToken, title) {

@@ -1,12 +1,48 @@
 export const router = require('express').Router()
 const formidable = require('formidable');
 import { SheetsHelper } from './sheets';
-import { convertCSVtoJSON, mapTransactions, sortByDate } from './data';
+import { mapTransactions, sortByDate, convertFileDataToJSON, convertCSVtoJSON } from './data';
 import * as moment from 'moment';
 import { resolve } from 'dns';
 
 
 // additions
+
+router.post('/updateSpreadsheet', (req, res) => {
+	console.log('updating...');
+	const accessToken = req.session.data['access_token'];
+	const form = new formidable.IncomingForm();
+
+	form.multiples = true;
+	form.parse(req);
+
+	const sheetsHelper = new SheetsHelper(accessToken);
+	let requests = [];
+
+	form.on('file', (name, file) => {
+		const noheader = name === 'usaa' ? true : false;
+		requests.push(convertFileDataToJSON(name, file, noheader));
+	});
+
+	form.on('end', () => {
+		let result = [];
+		Promise.all(requests).then((fileData) => {
+			fileData.forEach((data) => {
+				if (data.length) {
+					result = [...result, ...data].filter((val) => !!val);
+				}
+			});
+
+			sheetsHelper.updateSpreadsheetValues(result)
+				.then((spreadsheetVals) => {
+					if (spreadsheetVals) {
+						res.send('Successfully Added Transactions!')
+					}
+				})
+				.catch((err) => res.send('ERROR UPDATING SPREADSHEET VALS', err))
+		})
+	})
+})
 
 router.post('/createSpreadsheet', (req, res) => {
 	const accessToken = req.session.data['access_token'];

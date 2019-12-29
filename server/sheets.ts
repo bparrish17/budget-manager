@@ -2,7 +2,7 @@ import { BatchUpdate } from "./models";
 import { Row, HeaderRow, DataRow, CalculationRow, TitleRow } from "./row";
 import { sortByDate } from "./data";
 import { Transaction } from "./transaction";
-import { TITLE_ROW_IDX, HEADER_ROW_IDX, DATA_ROW_START_IDX, TEST_SHEET_ID } from "./constants";
+import { TITLE_ROW_IDX, HEADER_ROW_IDX, DATA_ROW_START_IDX, TEST_SHEET_ID, SHEET_ID } from "./constants";
 
 const { google } = require('googleapis');
 const { OAuth2Client } = require('google-auth-library');
@@ -10,7 +10,7 @@ const util = require('util');
 
 export class SheetsHelper {
   public service: any;
-  public sheet: string;
+  public sheet: string = 'Transactions';
 
   constructor(accessToken) {
     const auth = new OAuth2Client();
@@ -23,7 +23,7 @@ export class SheetsHelper {
     const addSheetRequest = this._addSheet(title)
 
     const batchRequest = {
-      spreadsheetId: TEST_SHEET_ID,
+      spreadsheetId: SHEET_ID,
       resource: {
         requests: [
           { addSheet: addSheetRequest }
@@ -43,8 +43,9 @@ export class SheetsHelper {
   }
 
   updateSpreadsheetValues(transactionData: Transaction[]) {
+    console.log('TRANSACTION DATA', transactionData)
     const batchRequest: BatchUpdate = {
-      spreadsheetId: TEST_SHEET_ID,
+      spreadsheetId: SHEET_ID,
       includeValuesInResponse: true,
       resource: {
         valueInputOption: 'USER_ENTERED',
@@ -78,14 +79,14 @@ export class SheetsHelper {
     const headers = ['Date', 'Amount', 'Description', 'Category']
     let result = [];
 
-    console.log('expenses')
+    // console.log('expenses')
 
     const expenseTitleRow = new TitleRow('expense', this.sheet, TITLE_ROW_IDX, 'Expenses')
     const expenseHeaderRow = new HeaderRow('expense', this.sheet, HEADER_ROW_IDX, headers);
     const expenses = sortByDate(transactionData.filter((trs) => trs.type === 'expense'));
     const expenseRows = expenses.map((trs, idx) => new DataRow(trs.type, this.sheet, idx + 3, trs));
 
-    console.log('income')
+    // console.log('income')
 
     const incomeTitleRow = new TitleRow('income', this.sheet, TITLE_ROW_IDX, 'Income')
     const incomeHeaderRow = new HeaderRow('income', this.sheet, HEADER_ROW_IDX, headers);
@@ -96,12 +97,12 @@ export class SheetsHelper {
     const totalHeaderRow = new HeaderRow('total', this.sheet, HEADER_ROW_IDX, ['Expenses', 'Income']);
 
     result = [
-      expenseTitleRow,
-      expenseHeaderRow,
-      incomeTitleRow,
-      incomeHeaderRow,
-      totalTitleRow,
-      totalHeaderRow,
+      // expenseTitleRow,
+      // expenseHeaderRow,
+      // incomeTitleRow,
+      // incomeHeaderRow,
+      // totalTitleRow,
+      // totalHeaderRow,
       ...expenseRows,
       ...incomeRows
     ];

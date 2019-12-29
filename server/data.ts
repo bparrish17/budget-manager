@@ -4,6 +4,9 @@ const moment = require("moment");
 
 import { AMEXTransaction, VenmoTransaction, USAATransaction } from './transaction';
 
+export function convertFileDataToJSON(accountName, file, noheader) {
+	return  convertCSVtoJSON(file.path, noheader).then((jsonData) => newMapTransactions(accountName, jsonData))
+}
 
 export function convertCSVtoJSON(path, noheader): Promise<any> {
   return new Promise((resolve, reject) => {
@@ -15,6 +18,21 @@ export function convertCSVtoJSON(path, noheader): Promise<any> {
 /*************************************************
  * DATA MANIPULATION
  *************************************************/
+
+function newMapTransactions(type, data) {
+	return data.map((transaction) => {
+		switch (type) {
+			case 'amex':
+				return createAMEXTransaction(transaction);
+			case 'usaa':
+				return createUSAATransaction(transaction);
+			case 'venmo':
+				return createVenmoTransaction(transaction);
+			default:
+				break;
+		}
+	});
+}
 
 export function mapTransactions(type, startDate, endDate, data) {
 	return data.map(transaction => {
@@ -38,12 +56,12 @@ export function mapTransactions(type, startDate, endDate, data) {
 	});
 };
 
-export function createAMEXTransaction(transaction): AMEXTransaction {
+function createAMEXTransaction(transaction): AMEXTransaction {
 	let amexTransaction = new AMEXTransaction(transaction);
 	return amexTransaction.amount > 0 ? amexTransaction : null;
 }
 
-export function createVenmoTransaction(transaction): VenmoTransaction {
+function createVenmoTransaction(transaction): VenmoTransaction {
 	const fieldsToDelete = ['ID', 'Note', 'Amount (fee)'];
 	fieldsToDelete.forEach((field) => delete transaction[field]);
 	const usedVenmoBalance = transaction['Funding Source'] === 'Venmo balance';
@@ -52,7 +70,7 @@ export function createVenmoTransaction(transaction): VenmoTransaction {
 	return usedVenmoBalance || wasRecipient ? new VenmoTransaction(transaction) : undefined;
 }
 
-export function createUSAATransaction(transaction): USAATransaction {
+function createUSAATransaction(transaction): USAATransaction {
 	const fieldsToDelete = ['field1', 'field2', 'field4'];
 	fieldsToDelete.forEach((field) => delete transaction[field]);
 	if (Object.keys(transaction).length) {
@@ -67,37 +85,3 @@ export function sortByDate(arr) {
 		return aDate.diff(bDate);
 	})
 }
-
-/*
- const readJSONFile = function(fileName) {
-	return new Promise((resolve, reject) => {
-		fs.readFile(fileName, (err, data) => {  
-			if (err) throw err;
-			let jsonData = JSON.parse(data);
-			resolve(jsonData);
-		});
-	})
-
-	const convertCSVToJSON = function() {
-	let data = [];
-	csv()
-		.on('data', (chunk) => {
-			data.push(chunk);
-		}).on('done', () => {
-			return data;
-		})
-}
-
-const parseUpload = function(form) {
-	return new Promise((resolve, reject) => {
-		return form.parse(req, (err, fields) => {
-			console.log('fields', fields);
-			if (err) reject(err)
-			const file = _.get(fields, ['file', 'path']);
-			console.log('file', file);
-			resolve(file);
-		});
-	})
-}
-
-*/

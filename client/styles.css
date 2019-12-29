@@ -13,6 +13,10 @@
   margin-top: 20px;
 }
 
+#form-container > div {
+  margin-top: 25px;
+}
+
 
 input {
   margin-top: 5px;

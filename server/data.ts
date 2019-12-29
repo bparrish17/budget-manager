@@ -5,7 +5,7 @@ const moment = require("moment");
 import { AMEXTransaction, VenmoTransaction, USAATransaction } from './transaction';
 
 export function convertFileDataToJSON(accountName, file, noheader) {
-	return  convertCSVtoJSON(file.path, noheader).then((jsonData) => newMapTransactions(accountName, jsonData))
+	return convertCSVtoJSON(file.path, noheader).then((jsonData) => newMapTransactions(accountName, jsonData))
 }
 
 export function convertCSVtoJSON(path, noheader): Promise<any> {

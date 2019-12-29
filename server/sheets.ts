@@ -18,41 +18,46 @@ export class SheetsHelper {
     this.service = google.sheets({version: 'v4', auth });
   }
 
-  updateSpreadsheet(title) {
-    this.sheet = title;
-    const addSheetRequest = this._addSheet(title)
+  public appendValues(transactionData: Transaction[]) {
 
-    const batchRequest = {
-      spreadsheetId: SHEET_ID,
-      resource: {
-        requests: [
-          { addSheet: addSheetRequest }
-        ],  // TODO: Update placeholder value.
-      },
-    };
+    const expenses = sortByDate(transactionData.filter((trs) => trs.type === 'expense'));
+    const incomes = sortByDate(transactionData.filter((trs) => trs.type === 'income'));
+    const expensesRequest = this._getLastColumnIndex('expenses').then((colIdx: string) => {
+      console.log('colIdx', colIdx);
+      return this._getAppendValuesRequest(expenses, colIdx)
+    });
+    const incomesRequest = this._getLastColumnIndex('incomes').then((colIdx: string) => {
+      console.log('colIdx', colIdx);
+      return this._getAppendValuesRequest(expenses, colIdx);
+    });
+    return Promise.all([expensesRequest, incomesRequest]);
+  }
+
+  private _getLastColumnIndex(type: 'expenses' | 'incomes') {
+    const column = type === 'expenses' ? 'A' : 'E';
+    const request = {
+      spreadsheetId: NEW_SHEET_ID,
+      range: `Transactions!${column}1:${column}100000000`
+    }
 
     return new Promise((resolve, reject) => {
-      this.service.spreadsheets.batchUpdate(batchRequest, (err, res) => {
-        if (err) reject(err);
-        console.log('res. data', res)
-        var spreadsheet = res.data;
-        // TODO: Add header rows.
-        resolve(spreadsheet);
+      this.service.spreadsheets.values.get(request, (err, res) => {
+        const lastIndex = res.data.values.length + 1 || 1;
+        resolve(`${column}${lastIndex}`);
       })
     })
   }
 
-  appendValues(transactionData: Transaction[]) {
+  private _getAppendValuesRequest(transactionData: Transaction[], columnIndex: string): Promise<any> {
     const request: Append = {
       spreadsheetId: NEW_SHEET_ID,
       insertDataOption: 'INSERT_ROWS',
-      range: 'Transactions!A1',
+      range: `Transactions!${columnIndex}`,
       valueInputOption: 'USER_ENTERED',
       resource: {
         values: this._getTransactionValues(transactionData)
       }
     }
-
     console.log('REQUEST: ', request);
     return new Promise((resolve, reject) => {
       this.service.spreadsheets.values.append(request, (err, res) => {
@@ -65,11 +70,22 @@ export class SheetsHelper {
         resolve(spreadsheet);
       })
     })
-
   }
 
+  private _getTransactionValues(transactionData: Transaction[]) {
+    return transactionData.map((transaction: Transaction) => {
+      const { displayDate: date, amount, name: description, category } = transaction;
+      return [date, amount, description, category]
+    })
+  }
+
+
+
+/*************************************************
+ * OLD METHODS
+ *************************************************/
+
   updateSpreadsheetValues(transactionData: Transaction[]) {
-    console.log('TRANSACTION DATA', transactionData)
     const batchRequest: BatchUpdate = {
       spreadsheetId: NEW_SHEET_ID,
       includeValuesInResponse: true,
@@ -81,7 +97,6 @@ export class SheetsHelper {
 
     return new Promise((resolve, reject) => {
       this.service.spreadsheets.values.batchUpdate(batchRequest, (err, res) => {
-        console.log('ERR: ', err, 'RES: ', res);
         if (err) {
           reject(err);
         }
@@ -101,11 +116,29 @@ export class SheetsHelper {
     }
   }
 
-  private _getTransactionValues(transactionData: Transaction[]) {
-    return transactionData.map((transaction: Transaction) => {
-      const { displayDate: date, amount, name: description, category } = transaction;
-      console.log(date, amount, description, category);
-      return [date, amount, description, category]
+
+
+
+  updateSpreadsheet(title) {
+    this.sheet = title;
+    const addSheetRequest = this._addSheet(title)
+
+    const batchRequest = {
+      spreadsheetId: SHEET_ID,
+      resource: {
+        requests: [
+          { addSheet: addSheetRequest }
+        ],  // TODO: Update placeholder value.
+      },
+    };
+
+    return new Promise((resolve, reject) => {
+      this.service.spreadsheets.batchUpdate(batchRequest, (err, res) => {
+        if (err) reject(err);
+        var spreadsheet = res.data;
+        // TODO: Add header rows.
+        resolve(spreadsheet);
+      })
     })
   }
 
@@ -149,7 +182,7 @@ export class SheetsHelper {
     //   result.push(new CalculationRow('income', this.sheet, incomeRows.length+2));
     // }
 
-    console.log('result', result);
+    // console.log('result', result);
     
     return result;
   }

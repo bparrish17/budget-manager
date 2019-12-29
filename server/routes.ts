@@ -9,7 +9,6 @@ import { resolve } from 'dns';
 // additions
 
 router.post('/updateSpreadsheet', (req, res) => {
-	console.log('updating...');
 	const accessToken = req.session.data['access_token'];
 	const form = new formidable.IncomingForm();
 

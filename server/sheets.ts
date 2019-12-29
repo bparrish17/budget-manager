@@ -22,14 +22,8 @@ export class SheetsHelper {
 
     const expenses = sortByDate(transactionData.filter((trs) => trs.type === 'expense'));
     const incomes = sortByDate(transactionData.filter((trs) => trs.type === 'income'));
-    const expensesRequest = this._getLastColumnIndex('expenses').then((colIdx: string) => {
-      console.log('colIdx', colIdx);
-      return this._getAppendValuesRequest(expenses, colIdx)
-    });
-    const incomesRequest = this._getLastColumnIndex('incomes').then((colIdx: string) => {
-      console.log('colIdx', colIdx);
-      return this._getAppendValuesRequest(incomes, colIdx);
-    });
+    const expensesRequest = this._getAppendValuesRequest(expenses, 'expenses');
+    const incomesRequest = this._getAppendValuesRequest(incomes, 'incomes');
     return Promise.all([expensesRequest, incomesRequest]);
   }
 
@@ -37,22 +31,23 @@ export class SheetsHelper {
     const column = type === 'expenses' ? 'A' : 'E';
     const request = {
       spreadsheetId: NEW_SHEET_ID,
-      range: `Transactions!${column}1:${column}100000000`
+      range: `${type}!${column}1:${column}100000000`
     }
 
     return new Promise((resolve, reject) => {
       this.service.spreadsheets.values.get(request, (err, res) => {
         const lastIndex = res.data.values.length + 1 || 1;
+        if (err) reject('Error Getting Spreadsheet Vals');
         resolve(`${column}${lastIndex}`);
       })
     })
   }
 
-  private _getAppendValuesRequest(transactionData: Transaction[], columnIndex: string): Promise<any> {
+  private _getAppendValuesRequest(transactionData: Transaction[], type: 'expenses' | 'incomes'): Promise<any> {
     const request: Append = {
       spreadsheetId: NEW_SHEET_ID,
       insertDataOption: 'INSERT_ROWS',
-      range: `Transactions!${columnIndex}`,
+      range: `${type}!A1`,
       valueInputOption: 'USER_ENTERED',
       resource: {
         values: this._getTransactionValues(transactionData)

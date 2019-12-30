@@ -5,7 +5,7 @@
   align-items: center;
 }
 
-#form-container {
+#uploadForm {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -13,7 +13,7 @@
   margin-top: 20px;
 }
 
-#form-container > div {
+#uploadForm > div {
   margin-top: 25px;
 }
 

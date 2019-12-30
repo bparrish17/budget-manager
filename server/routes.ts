@@ -5,6 +5,7 @@ import { convertFileDataToJSON } from './data';
 
 
 router.post('/updateSpreadsheet', (req, res) => {
+	console.log(' =========== ');
 	const accessToken = req.session.data['access_token'];
 	const form = new formidable.IncomingForm();
 
@@ -31,7 +32,9 @@ router.post('/updateSpreadsheet', (req, res) => {
 			sheetsHelper.appendValues(result)
 				.then((spreadsheetVals) => {
 					if (spreadsheetVals) {
-						res.send('Successfully Added Transactions!')
+						console.log('spreadsheet vals ==========', spreadsheetVals);
+						res.redirect('back');
+						// res.send('Successfully Added Transactions!')
 					}
 				})
 				.catch((err) => res.send('ERROR UPDATING SPREADSHEET VALS', err))

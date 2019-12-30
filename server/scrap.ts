@@ -335,4 +335,40 @@ export function mapTransactions(type, startDate, endDate, data) {
 	});
 };
 
+
+
+
+
+
+
+
+
+
+
+===================== Constants.ts =======================
+
+
+
+// COLUMNS
+
+export const EXPENSE_AMOUNT_COL = 'B';
+export const INCOME_AMOUNT_COL = 'G';
+
+export const EXPENSE_FIRST_COL = 'A';
+export const INCOME_FIRST_COL = 'E'
+export const TOTAL_FIRST_COL = 'I';
+
+export const EXPENSE_LAST_COL = 'D';
+export const INCOME_LAST_COL = 'H';
+export const TOTAL_LAST_COL = 'J';
+
+
+// ROWS
+
+export const TITLE_ROW_IDX = '1';
+export const HEADER_ROW_IDX = '2';
+export const DATA_ROW_START_IDX = '3';
+
+
+
 */

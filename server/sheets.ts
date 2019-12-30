@@ -1,10 +1,12 @@
 import { Append } from "./models";
 import { sortByDate } from "./data";
 import { Transaction } from "./transaction";
-import { SHEET_ID } from "./constants";
 
 const { google } = require('googleapis');
 const { OAuth2Client } = require('google-auth-library');
+
+const TEST_SHEET_ID = '1iRHLWOk7E_SPFO_n6Ok0xci__SUtApQGhseuOzz0ThI';
+const SHEET_ID = '1Kwlz2FG-nuHyQM0ieNsUZUfKTpq06OM-wnWcc3LT4Ko';
 
 export class SheetsHelper {
   public service: any;

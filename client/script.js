@@ -9,14 +9,14 @@ function onSignIn(user) {
     .then((res) => res.json())
     .then((data) => {
       if (data) {
-        newAddFormToDocument();
+        addFormToDocument();
       }
     })
     .catch((err) => (console.log('Fetch Error', err)));
 }
 
-function newAddFormToDocument() {
-  const form = document.getElementById('form-container');
+function addFormToDocument() {
+  const form = document.getElementById('uploadForm');
 
   // Amex Input
   const amexInput = document.createElement('input')
@@ -56,16 +56,15 @@ function storeAuthData(data) {
   })
 }
 
-function updateSpreadsheet(accessToken, title) {
+function updateSpreadsheet(event) {
+  console.log('form', document.forms);
   fetch('/api/updateSpreadsheet', { 
     method: 'post',
     headers: { "Content-type": "application/json; charset=UTF-8" },
-    body: JSON.stringify({ accessToken, title })
+    body: JSON.stringify({})
   })
   .then((res) => {
-    res.json().then((data) => {
-      console.log('data', data);
-    })
+    console.log('RES: ', res);
   })
 }
 

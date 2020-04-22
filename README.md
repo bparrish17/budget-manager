@@ -1,5 +1,7 @@
 # Budget Manager
 
+HTML | Node | Typescript
+
 Budget Manager App
 
 * Authenticate with your Google account

@@ -29,15 +29,20 @@ router.post('/updateSpreadsheet', (req, res) => {
 				}
 			});
 
+			console.log('-----', fileData)
+
 			sheetsHelper.appendValues(result)
 				.then((spreadsheetVals) => {
 					if (spreadsheetVals) {
 						console.log('spreadsheet vals ==========', spreadsheetVals);
-						res.redirect('back');
+						res.send('Successfully Added Transactions');
 						// res.send('Successfully Added Transactions!')
 					}
 				})
-				.catch((err) => res.send('ERROR UPDATING SPREADSHEET VALS', err))
+				.catch((err) => {
+					console.log('ERR', err);
+					res.send('ERROR UPDATING SPREADSHEET VALS', err)
+				})
 		})
 	})
 })

@@ -1,5 +1,5 @@
 import { CatMap } from "./models";
-import { EXPENSE_CATEGORIES, EXPENSE_CATEGORY_MAP } from "./expense_categories";
+import { EXPENSE_CATEGORIES, EXPENSE_CATEGORY_MAP, CHASE_EXPENSE_CATEGORY_MAP } from "./expense_categories";
 import { INCOME_CATEGORIES, INCOME_CATEGORY_MAP } from "./income_categories";
 import * as moment from 'moment';
 import { Moment } from "moment";
@@ -62,6 +62,37 @@ function toTitleCase(str: string) {
 		return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
 	}
 	);
+}
+
+export interface RawChaseTransaction {
+	'Transaction Date': string;
+	'Post Date': string;
+	Description: string;
+	Category: string;
+	Type: string;
+	Amount: string;
+}
+
+export class ChaseTransaction extends Transaction {
+	constructor(transaction: RawChaseTransaction) {
+		super();
+		this.source = 'chase';
+    this.date = moment(transaction['Transaction Date']);
+		this.displayDate = moment(transaction['Transaction Date']).format('MM/DD/YYYY');
+    this.name = toTitleCase(transaction['Description']);
+    this.amount = this.setAmount(transaction['Amount']);
+		this.type = Number(transaction['Amount']) < 0 ? 'expense' : 'income'
+		this.category = this.setCategory(transaction['Category']);
+	}
+
+	setAmount(amt) {
+		return Math.abs(Number(amt));
+	}
+
+	setCategory(category) {
+		const mappedCategory = CHASE_EXPENSE_CATEGORY_MAP[category];
+		return mappedCategory ? toTitleCase(mappedCategory) : 'Other'
+	}
 }
 
 /*************************************************

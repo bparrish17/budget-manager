@@ -8,39 +8,42 @@ function onSignIn(user) {
   this.storeAuthData(authData)
     .then((res) => res.json())
     .then((data) => {
-      if (data) {
+      const formElem = document.getElementById('uploadForm');
+      const hasInputs = [].slice.call(formElem.children).length > 0;
+      if (data && !hasInputs) {
         addFormToDocument();
       }
     })
     .catch((err) => (console.log('Fetch Error', err)));
 }
 
+function addFieldToForm(form, field) {
+  const { name, innerText } = field;
+  const inputEl = document.createElement('input')
+  const labelEl = document.createElement('div')
+  inputEl.type = 'file';
+  inputEl.name = name;
+  labelEl.innerText = innerText;
+
+  form.appendChild(labelEl);
+  form.appendChild(inputEl);
+}
+
 function addFormToDocument() {
   const form = document.getElementById('uploadForm');
+  const fields = [
+    { name: 'amex', innerText: 'American Express' },
+    { name: 'chase', innerText: 'Chase' },
+    { name: 'usaa', innerText: 'USAA' }
+  ];
 
-  // Amex Input
-  const amexInput = document.createElement('input')
-  const amexLabel = document.createElement('div')
-  amexInput.type = 'file';
-  amexInput.name = 'amex';
-  amexLabel.innerText = 'American Express';
-
-  // USAA input
-  const usaaInput = document.createElement('input');
-  const usaaLabel = document.createElement('div');
-  usaaInput.type = 'file';
-  usaaInput.name = 'usaa';
-  usaaLabel.innerText = 'USAA';
+  fields.forEach((field) => addFieldToForm(form, field));
 
   // Submit Button
   const submitInput = document.createElement('input');
   submitInput.type = 'submit';
   submitInput.value = 'Submit';
 
-  form.appendChild(amexLabel);
-  form.appendChild(amexInput);
-  form.appendChild(usaaLabel);
-  form.appendChild(usaaInput);
   form.appendChild(submitInput);
 }
 

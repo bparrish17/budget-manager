@@ -18,7 +18,6 @@ export class SheetsHelper {
   }
 
   public appendValues(transactionData: Transaction[]) {
-
     const investments = sortByDate(transactionData.filter((trs) => trs.type === 'investment'));
     const expenses = sortByDate(transactionData.filter((trs) => trs.type === 'expense'));
     const incomes = sortByDate(transactionData.filter((trs) => trs.type === 'income'));

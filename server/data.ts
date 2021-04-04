@@ -2,7 +2,7 @@ const fs = require("fs");
 const csv = require("csvtojson");
 const moment = require("moment");
 
-import { AMEXTransaction, VenmoTransaction, USAATransaction } from './transaction';
+import { AMEXTransaction, VenmoTransaction, USAATransaction, ChaseTransaction, RawChaseTransaction } from './transaction';
 
 export function convertFileDataToJSON(accountName, file, noheader) {
 	return convertCSVtoJSON(file.path, noheader).then((jsonData) => mapTransactions(accountName, jsonData))
@@ -24,6 +24,8 @@ function mapTransactions(type, data) {
 		switch (type) {
 			case 'amex':
 				return createAMEXTransaction(transaction);
+			case 'chase':
+				return createChaseTransaction(transaction);
 			case 'usaa':
 				return createUSAATransaction(transaction);
 			case 'venmo':
@@ -37,6 +39,11 @@ function mapTransactions(type, data) {
 function createAMEXTransaction(transaction): AMEXTransaction {
 	let amexTransaction = new AMEXTransaction(transaction);
 	return amexTransaction.amount > 0 ? amexTransaction : null;
+}
+
+function createChaseTransaction(transaction: RawChaseTransaction): ChaseTransaction {
+	if (transaction.Type === 'Payment') return null;
+	return new ChaseTransaction(transaction);
 }
 
 function createVenmoTransaction(transaction): VenmoTransaction {
@@ -53,6 +60,7 @@ function createUSAATransaction(transaction): USAATransaction {
 	fieldsToDelete.forEach((field) => delete transaction[field]);
 	if (Object.keys(transaction).length) {
 		const usaaTransaction = new USAATransaction(transaction);
+		if (usaaTransaction.name.toLowerCase().includes('chase credit crd epay')) return null;
 		if (usaaTransaction.name.toLowerCase().includes('amex epayment')) return null;
 		if (usaaTransaction.name.toLowerCase().includes('usaa funds transfer')) return null;
 		return usaaTransaction;

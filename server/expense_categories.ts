@@ -97,3 +97,12 @@ export const EXPENSE_CATEGORY_MAP: CatMap = {
   OTHER,
   CASH_WITHDRAWAL
 }
+
+export const CHASE_EXPENSE_CATEGORY_MAP: { [key: string]: string } = {
+  'Food & Drink': 'EATING_OUT',
+  'Groceries': 'Groceries',
+  'Travel': 'TRAVEL',
+  'Shopping': 'ENTERTAINMENT',
+  'Health & Wellness': 'PERSONAL',
+  'Professional Services': 'OTHER',
+}

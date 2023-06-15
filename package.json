@@ -6,11 +6,13 @@
   "repository": "https://github.com/bparrish17/budget-manager",
   "scripts": {
     "start": "nodemon --watch 'server/*.ts' --exec 'ts-node' app.ts",
-    "start-dev": "nodemon --exec 'ts-node' file-handler.ts"
+    "start-dev": "nodemon --exec 'ts-node' file-handler.ts -y 2023 -m May"
   },
   "dependencies": {
     "4": "0.0.0",
     "body-parser": "~1.13.2",
+    "chalk": "^4.1.2",
+    "commander": "^10.0.1",
     "csvtojson": "^2.0.8",
     "express": "^4.13.4",
     "express-handlebars": "^3.0.0",

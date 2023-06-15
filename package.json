@@ -5,7 +5,8 @@
   "license": "Apache-2.0",
   "repository": "https://github.com/bparrish17/budget-manager",
   "scripts": {
-    "start": "nodemon --watch 'server/*.ts' --exec 'ts-node' app.ts"
+    "start": "nodemon --watch 'server/*.ts' --exec 'ts-node' app.ts",
+    "start-dev": "nodemon --exec 'ts-node' file-handler.ts"
   },
   "dependencies": {
     "4": "0.0.0",

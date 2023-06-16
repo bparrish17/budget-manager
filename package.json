@@ -6,7 +6,9 @@
   "repository": "https://github.com/bparrish17/budget-manager",
   "scripts": {
     "start": "nodemon --watch 'server/*.ts' --exec 'ts-node' app.ts",
-    "start-dev": "nodemon --exec 'ts-node' file-handler.ts -y 2023 -m May"
+    "start-dev": "nodemon --exec 'ts-node' file-handler.ts -y 2023 -m May",
+    "june": "npx ts-node main.ts -y 2023 -m june",
+    "reset": "npx ts-node main.ts -r -y 2023 -m june"
   },
   "dependencies": {
     "4": "0.0.0",

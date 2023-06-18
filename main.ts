@@ -1,5 +1,6 @@
 import { Command } from 'commander';
 import fileHandler, { resetFiles } from "./file-handler";
+import fileReader from "./file-reader"
 
 async function main() {
   const program = new Command();
@@ -16,7 +17,14 @@ async function main() {
     process.exit(0)
   }
 
-  await fileHandler(options.year, options.month);
+  // const filePaths = await fileHandler(options.year, options.month);
+  const filePaths = {
+    usaa: '/Users/brianparrish/Documents/Finance/2023/6 - June/usaa.csv',
+    amex: '/Users/brianparrish/Documents/Finance/2023/6 - June/amex.csv',
+    chase: '/Users/brianparrish/Documents/Finance/2023/6 - June/chase.csv'
+  }
+  await fileReader(filePaths);
+  // console.log('filePaths', filePaths);
 }
 
 main();

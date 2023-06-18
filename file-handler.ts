@@ -2,15 +2,11 @@ import { promises as fsPromises } from "fs";
 import * as _ from 'lodash';
 import * as chalk from 'chalk';
 import { MONTH_LIST } from "./constants";
+import { FilePaths } from "./server/models";
 
 const DOWNLOADS_DIR = `/Users/brianparrish/Downloads`
 const FINANCE_DIR = `/Users/brianparrish/Documents/Finance`;
 
-interface FileList {
-  usaa: string | number;
-  amex: string | number;
-  chase: string | number;
-}
  
 async function getFileFromDownloads(fileName) {
   const files = await fsPromises.readdir(DOWNLOADS_DIR);
@@ -20,7 +16,7 @@ async function getFileFromDownloads(fileName) {
   else return matches[0];
 }
 
-async function checkForFiles(): Promise<FileList> {
+async function checkForFiles(): Promise<FilePaths> {
   const errors = [];
   const handleErr = (err) => errors.push(err.message);
   const usaa = await getFileFromDownloads("bk_download.csv").catch(handleErr)
@@ -46,16 +42,17 @@ async function moveFileToDir(filePath: string, targetName: string, targetDir: st
   return fsPromises.rename(filePath, newPath).then(() => newPath);
 }
 
-async function moveFiles(year: string, month: string, files: FileList) {
+async function moveFiles(year: string, month: string, files: FilePaths): Promise<FilePaths> {
   const newMonthDir = await makeDirForMonth(year, month)
   const errors = [];
   const handleErr = (err) => errors.push(err.message);
-  await moveFileToDir(`${DOWNLOADS_DIR}/${files.usaa}`, 'usaa.csv', newMonthDir).catch(handleErr)
-  await moveFileToDir(`${DOWNLOADS_DIR}/${files.amex}`, 'amex.csv', newMonthDir).catch(handleErr)
-  await moveFileToDir(`${DOWNLOADS_DIR}/${files.chase}`, 'chase.csv', newMonthDir).catch(handleErr)
+  const usaa = await moveFileToDir(`${DOWNLOADS_DIR}/${files.usaa}`, 'usaa.csv', newMonthDir).catch(handleErr)
+  const amex = await moveFileToDir(`${DOWNLOADS_DIR}/${files.amex}`, 'amex.csv', newMonthDir).catch(handleErr)
+  const chase = await moveFileToDir(`${DOWNLOADS_DIR}/${files.chase}`, 'chase.csv', newMonthDir).catch(handleErr)
   if (errors.length) {
     throw new Error(errors.join("\n"))
   }
+  return { usaa, amex, chase }
 }
 
 export async function resetFiles(year, month) {
@@ -70,13 +67,15 @@ export async function resetFiles(year, month) {
 }
 
 export default async function main(year: string, month: string) {
-  const files = await checkForFiles().catch((err) => {
+  const fileDownloadPaths = await checkForFiles().catch((err) => {
     console.error(chalk.red(`ERRORS:\n`, err.message));
     process.exit(0)
   });
 
-  await moveFiles(year, month, files).catch((err) => {
+  const fileMovedPaths = await moveFiles(year, month, fileDownloadPaths).catch((err) => {
     console.error(chalk.red(`ERRORS:\n`, err.message));
     process.exit(0)
   })
+
+  return fileMovedPaths;
 }

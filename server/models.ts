@@ -50,3 +50,21 @@ export interface GridData {
 export interface RowData {
   values: any[]
 }
+
+type Banks = 'usaa' | 'amex' | 'chase';
+
+export type FilePaths = {
+  [bank in Banks]: string | number;
+}
+
+export interface RawTransaction {
+  Date: string;
+  Description: string;
+  Amount: number;
+  Category?: string;
+}
+
+export type RawTransactions = {
+  [bank in Banks]: RawTransaction;
+}
+

@@ -1,7 +1,7 @@
-import { CategoryMap } from "./models";
+import { CategoryMap, RawChaseTransaction, RawTransaction } from "./models";
 import { EXPENSE_CATEGORY_MAP, CHASE_EXPENSE_CATEGORY_MAP, INCOME_CATEGORY_MAP } from "../categories";
-import * as moment from 'moment';
 import * as _ from 'lodash';
+import * as moment from 'moment';
 import { Moment } from "moment";
 
 export class Transaction {
@@ -38,7 +38,7 @@ export type TransactionType = 'income' | 'expense' | 'investment';
  *************************************************/
 
 export class AMEXTransaction extends Transaction {
-  constructor(transaction) {
+  constructor(transaction: RawTransaction) {
 		super();
 		this.source = 'amex'
     this.date = moment(transaction["Date"]);
@@ -62,15 +62,9 @@ export class AMEXTransaction extends Transaction {
 	}
 }
 
-
-export interface RawChaseTransaction {
-	'Transaction Date': string;
-	'Post Date': string;
-	Description: string;
-	Category: string;
-	Type: string;
-	Amount: string;
-}
+/*************************************************
+ * CHASE
+ *************************************************/
 
 export class ChaseTransaction extends Transaction {
 	constructor(transaction: RawChaseTransaction) {
@@ -101,7 +95,7 @@ export class ChaseTransaction extends Transaction {
 
 
 export class USAATransaction extends Transaction {
-	constructor(transaction) {
+	constructor(transaction: RawTransaction) {
 		super();
 		this.source = 'usaa';
 		this.date = moment(transaction['Date']);
@@ -144,6 +138,5 @@ function findCategory(description: string, categoryMap: CategoryMap) {
 function toTitleCase(str: string) {
 	return str.replace(/_/g, ' ').replace(/\w\S*/g, (txt) => {
 		return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-	}
-	);
+	});
 }

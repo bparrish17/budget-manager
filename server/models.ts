@@ -64,6 +64,11 @@ export interface RawTransaction {
   Category?: string;
 }
 
+export interface RawChaseTransaction extends RawTransaction {
+	'Transaction Date': string;
+	'Post Date': string;
+}
+
 export type RawTransactions = {
   [bank in Banks]: RawTransaction;
 }

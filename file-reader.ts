@@ -1,5 +1,5 @@
-import { FilePaths, RawTransaction } from "./server/models";
-import { AMEXTransaction, ChaseTransaction, USAATransaction } from "./server/transaction";
+import { FilePaths, RawChaseTransaction, RawTransaction } from "./server/models";
+import { AMEXTransaction, ChaseTransaction, Transaction, USAATransaction } from "./server/transaction";
 const csv = require("csvtojson");
 
 function isTransfer(transaction: RawTransaction) {
@@ -12,26 +12,22 @@ function isTransfer(transaction: RawTransaction) {
     "payment thank you - web",
     "american express credit card",
     "chase credit card"
-  ].some((desc) => {
-    if (transaction.Description.toLowerCase().includes(desc)) {
-      console.log('IS TRANSFER', transaction.Description);
-      return true;
-    }
-    else return false;
-  })
+  ].some((desc) => transaction.Description.toLowerCase().includes(desc))
 }
 
+type TransactionConverter = (trx: RawTransaction) => Transaction;
+
 export function getTransactionsFromCSV(
-  filePath,
+  filePath: string | number,
   parseParams: { [key: string]: unknown } = { noheader: false }
-): (transactionConstructor: Function) => Promise<RawTransaction> {
-  return (transactionConstructor) =>
+): (transactionConverter: TransactionConverter) => Promise<Transaction[]> {
+  return (transactionConverter) =>
     csv(parseParams)
       .fromFile(filePath)
       .then((rawTransactions: RawTransaction[]) =>
         rawTransactions
           .filter((rawTrx) => !isTransfer(rawTrx))
-          .map((rawTrx) => transactionConstructor(rawTrx))
+          .map((rawTrx) => transactionConverter(rawTrx))
       );
 }
 
@@ -50,6 +46,6 @@ export default async function main(filePaths: FilePaths): Promise<any> {
   return {
     usaa: await getTransactionsFromCSV(filePaths.usaa, usaaParser)((trx) => new USAATransaction(trx)),
     amex: await getTransactionsFromCSV(filePaths.amex)((trx) => new AMEXTransaction(trx)),
-    chase: await getTransactionsFromCSV(filePaths.chase)((trx) => new ChaseTransaction(trx))
+    chase: await getTransactionsFromCSV(filePaths.chase)((trx: RawChaseTransaction) => new ChaseTransaction(trx))
   }
 }

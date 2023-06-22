@@ -1,108 +1,73 @@
-import { CatMap } from "./models";
+import { CatMap } from './models';
 
-export const GROCERIES = [
-	'MARLOW & DAUGHTERS',
-	'MR PINA',
-  'BROOKLYN HARVEST',
-  'BROOKLYN FARE GREENWICH',
-  'BROOKLYN HARVEST',
-  'MET FOOD',
-]
-
-export const INTEREST = [
-	'INTEREST CHARGE ON PURCHASES',
-]
-
-export const PERSONAL = [
-  'WALGREENS',
-  'SI LAUNDROMAT & DRY CLEA',
-  'HUDSON SQUARE PHARMACY',
-  'WHISK',
-  'LEVI.COM',
-  'CLOTHING',
-  'APPAREL',
-  'NINTENDO',
-  'LAUNDROMAT',
-  'LEVI',
-  'CALVINKLEIN',
-  'REDBUBBLE',
-  'PLAYSTATION'
-]
-
-export const TRANSPORT = [
-  'METROCARD MACHINE NEW YORK NY',
-  'METROCARD'
-]
-
-export const EATING_OUT = [
-  'BAGEL ON THE SQUARE',
-  'HAVE A BAGEL',
-  'SHAKE SHACK',
-  'RESTAURANT',
-  'GRILL',
-  'COFFEE',
-  'SEAMLSS',
-  'CAFE',
-  'GRUBHUB',
-  'SEAMLESS',
-  'SALAD',
-  'KABOB',
-  'CAVIAR',
-  'POSTMATE',
-  'COOKIE'
-];
-
-export const ALCOHOL = [
-  'GRAIN & VINE',
-  'THE LATE LATE',
-  'ALE'
-]
-
-export const UTILITIES = []
-export const TRAVEL = ['DELTA AIR LINES']
-export const ENTERTAINMENT = ['SPOTIFY', 'SOFAR']
-export const VENMO = ['VENMO'];
-export const OTHER = [];
-export const CASH_WITHDRAWAL = [];
-export const RENT = [];
-
-export const EXPENSE_CATEGORIES = [
-	'RENT',
-	'GROCERIES',
-	'EATING_OUT',
-	'CASH_WITHDRAWAL',
-	'TRANSPORT',
-	'ALCOHOL',
-	'ENTERTAINMENT',
-	'UTILITIES',
-	'TRAVEL',
-	'INTEREST',
-	'VENMO',
-	'PERSONAL',
-	'OTHER'
-];
+export const EXPENSE_CATEGORIES = [];
 
 export const EXPENSE_CATEGORY_MAP: CatMap = {
-  GROCERIES,
-  INTEREST,
-  PERSONAL,
-  TRANSPORT,
-  RENT,
-  EATING_OUT,
-  ALCOHOL,
-  UTILITIES,
-  TRAVEL,
-  ENTERTAINMENT,
-  VENMO,
-  OTHER,
-  CASH_WITHDRAWAL
-}
+  MORTAGE: ['Citizens Bank Mortgage Payment'],
+  HOA: ['The Wilburn House Ownerdraft'],
+  INSURANCE: ['Usaa Property And Casualty Insurance'],
+  VEHICLE: ['Toyota Financial Services', 'Chevron', 'Shell Oil', "Love's"],
+  GROCERIES: ['Publix', 'Alons', 'Counter Culture', 'Butcher', 'Pharmacy', 'CVS'],
+  UTILITIES: ['Fiber', 'Georgia Power'],
+  PERSONAL: ['Anguished', 'Richard S Variety', 'Levi'],
+  TRANSPORT: ['Lyft', 'Uber', 'Marta'],
+  EATING_OUT: [
+    'Doordash',
+    'Metrofresh',
+    'Chick-Fil-A',
+    'Jersey Mikes',
+    'Nook',
+    'Willy',
+    'Cafe Lucia',
+    'Iron Age',
+    'Mellow Mushroom',
+    'Caribou',
+    'Restaurant',
+    'Dunkin',
+    'Atwood',
+    'Antico',
+    'Pisco',
+    'Little Rey',
+    'Chipotle',
+    'Deli',
+    'Shake Shack',
+    'Muchacho',
+    'Brewery',
+    'Brewing',
+    'Cafe',
+    'Aria',
+    'Firehouse',
+    'Taco'
+  ],
+  ALCOHOL: ['Ansley Wine Merchant'],
+  TRAVEL: ['Delta Air Lines'],
+  ENTERTAINMENT: [
+    'Youtube TV',
+    'NYTimes',
+    'Paramount',
+    'Peacock',
+    'Hulu',
+    'Patreon',
+    'Steamgames',
+    'Steam Purchase',
+    'Epic Games',
+    'Nintendo',
+    'Blizzard',
+    'Spotify',
+    'BobbyJones',
+    'Bobby Jones',
+    'Stonewall',
+    'Atlanta Sport',
+    'Levy-Mercedes Benz',
+  ],
+};
 
 export const CHASE_EXPENSE_CATEGORY_MAP: { [key: string]: string } = {
   'Food & Drink': 'EATING_OUT',
-  'Groceries': 'Groceries',
+  'Groceries': 'GROCERIES',
   'Travel': 'TRAVEL',
   'Shopping': 'ENTERTAINMENT',
+  'Entertainment': 'ENTERTAINMENT',
   'Health & Wellness': 'PERSONAL',
   'Professional Services': 'OTHER',
 }

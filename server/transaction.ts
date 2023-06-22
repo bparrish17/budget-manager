@@ -1,6 +1,6 @@
 import { CatMap } from "./models";
-import { EXPENSE_CATEGORIES, EXPENSE_CATEGORY_MAP, CHASE_EXPENSE_CATEGORY_MAP } from "./expense_categories";
-import { INCOME_CATEGORIES, INCOME_CATEGORY_MAP } from "./income_categories";
+import { EXPENSE_CATEGORY_MAP, CHASE_EXPENSE_CATEGORY_MAP } from "./expense_categories";
+import { INCOME_CATEGORY_MAP } from "./income_categories";
 import * as moment from 'moment';
 import { Moment } from "moment";
 
@@ -12,6 +12,10 @@ export class Transaction {
 	public amount: number | string;
 	public type: TransactionType;
 	public category: any;
+
+	public setName(description = '') {
+		return toTitleCase(description.replace(/\s\s+/g, ' '))
+	}
 }
 
 export type TransactionType = 'income' | 'expense' | 'investment';
@@ -26,7 +30,7 @@ export class AMEXTransaction extends Transaction {
 		this.source = 'amex'
     this.date = moment(transaction["Date"]);
     this.displayDate = moment(transaction["Date"]).format("MM/DD/YYYY");
-    this.name = toTitleCase(transaction["Description"]);
+    this.name = super.setName(transaction["Description"]);
     this.amount = Number(transaction["Amount"]);
 		this.type = this.setType(transaction['Amount']);
 		this.category = this.setCategory(transaction["Description"]);
@@ -40,17 +44,19 @@ export class AMEXTransaction extends Transaction {
 		return Number(amt) < 0 ? 'income' : 'expense';
 	}
 
-  setCategory(name) {
-		return searchForCategory(name, EXPENSE_CATEGORIES, EXPENSE_CATEGORY_MAP);
+  setCategory(description) {
+		return searchForCategory(description, EXPENSE_CATEGORY_MAP);
 	}
 }
 
-function searchForCategory(name: string, categories: string[], categoryMap: CatMap) {
+function searchForCategory(description: string, categoryMap: CatMap) {
+	const categories = Object.keys(categoryMap);
 	let result = categories.find((category): any => {
 		const categoryItems = categoryMap[category]
 		return categoryItems.find((item) => {
-			if (item === name) return true;
-			else if (name.toUpperCase().includes(item)) return true;
+			item = item.toUpperCase();
+			if (item === description) return true;
+			else if (description.toUpperCase().includes(item)) return true;
 			else return false;
 		})
 	})
@@ -79,19 +85,20 @@ export class ChaseTransaction extends Transaction {
 		this.source = 'chase';
     this.date = moment(transaction['Transaction Date']);
 		this.displayDate = moment(transaction['Transaction Date']).format('MM/DD/YYYY');
-    this.name = toTitleCase(transaction['Description']);
+    this.name = super.setName(transaction['Description']);
     this.amount = this.setAmount(transaction['Amount']);
 		this.type = Number(transaction['Amount']) < 0 ? 'expense' : 'income'
-		this.category = this.setCategory(transaction['Category']);
+		this.category = this.setCategory(transaction['Description'], transaction['Category']);
 	}
 
 	setAmount(amt) {
 		return Math.abs(Number(amt));
 	}
 
-	setCategory(category) {
-		const mappedCategory = CHASE_EXPENSE_CATEGORY_MAP[category];
-		return mappedCategory ? toTitleCase(mappedCategory) : 'Other'
+	setCategory(description, category) {
+		const byDesc = searchForCategory(description, EXPENSE_CATEGORY_MAP);
+		const byCategory = CHASE_EXPENSE_CATEGORY_MAP[category] || "OTHER";		
+		return byDesc === 'Other' ? toTitleCase(byCategory) : byDesc;
 	}
 }
 
@@ -104,12 +111,11 @@ export class USAATransaction extends Transaction {
 	constructor(transaction) {
 		super();
 		this.source = 'usaa';
-		this.date = moment(transaction['field3']);
-		this.displayDate = moment(transaction['field3']).format('MM/DD/YYYY');
-		this.name = this.setName(transaction['field5']);
-		this.amount = this.setAmount(transaction['field7']);
-		this.type = this.setType(transaction['field7'], this.name);
-		console.log('TYPE: ', this.type)
+		this.date = moment(transaction['Date']);
+		this.displayDate = moment(transaction['Date']).format('MM/DD/YYYY');
+		this.name = super.setName(transaction['Description']);
+		this.amount = this.setAmount(transaction['Amount']);
+		this.type = this.setType(transaction['Amount'], this.name);
 		this.category = this.setCategory(this.name || '');
 	}
 
@@ -118,59 +124,12 @@ export class USAATransaction extends Transaction {
 	}
 
 	setType(amt, name): TransactionType {
-		console.log('name', name);
-		if (name.toLowerCase().includes('schwab brokerage moneylink')) return 'investment';
+		if (name.toLowerCase().includes('schwab')) return 'investment';
 		else return Number(amt) < 0 ? 'expense' : 'income';
 	}
 
-	setName(name) {
-		return name ? toTitleCase(name.split('    ')[0]) : '';
-	}
-
-	setCategory(name) {
-		const categories = this.type === 'expense' ? EXPENSE_CATEGORIES : INCOME_CATEGORIES;
+	setCategory(description) {
 		const categoryMap = this.type === 'expense' ? EXPENSE_CATEGORY_MAP : INCOME_CATEGORY_MAP;
-
-		if (this.amount === 1400) return 'Rent';
-		return searchForCategory(name, categories, categoryMap);
-	}
-}
-
-/*************************************************
- * VENMO
- *************************************************/
-
-
-export class VenmoTransaction extends Transaction {
-	constructor(transaction) {
-		super();
-		this.source = 'venmo';
-		this.date = moment(transaction['Datetime']);
-		this.displayDate = moment(transaction['Datetime']).format('MM/DD/YYYY');
-		this.name = this.setName(transaction['Type'], transaction['To'], transaction['From']);
-		this.amount = this.setAmount(transaction['Amount (total)']);
-		this.type = this.setType(transaction['Amount (total)'][0])
-		this.category = 'Venmo';
-	}
-
-	setType(plus: string) {
-		return plus === '+' ? 'income' : 'expense';
-	}
-
-	setAmount(amt: string) {
-		return Number(amt.split('$')[1]);
-	}
-
-	setName(type, to, frum) {
-		let name = `Venmo `;
-		if (type === 'Charge') {
-			if (this.type === 'expense') name += `to ${frum}`;
-			if (this.type === 'income')	name += `from ${to}`;
-		}
-		if (type === 'Payment') {
-			if (this.type === 'expense') name += `to ${to}`;
-			if (this.type === 'income') name += `from ${frum}`;
-		}
-		return name;
+		return searchForCategory(description, categoryMap);
 	}
 }

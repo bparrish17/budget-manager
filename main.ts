@@ -23,8 +23,8 @@ async function main() {
     amex: '/Users/brianparrish/Documents/Finance/2023/6 - June/amex.csv',
     chase: '/Users/brianparrish/Documents/Finance/2023/6 - June/chase.csv'
   }
-  await fileReader(filePaths);
-  // console.log('filePaths', filePaths);
+  const result = await fileReader(filePaths);
+  console.log('result', result);
 }
 
 main();

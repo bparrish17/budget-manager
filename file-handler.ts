@@ -1,6 +1,7 @@
-import { promises as fsPromises } from "fs";
-import * as _ from 'lodash';
 import * as chalk from 'chalk';
+import * as _ from 'lodash';
+import { promises as fsPromises } from "fs";
+
 import { MONTH_LIST } from "./constants";
 import { FilePaths } from "./server/models";
 

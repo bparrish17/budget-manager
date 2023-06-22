@@ -1,4 +1,4 @@
-import { CatMap } from "./models";
+import { CategoryMap } from "./models";
 
 export const SAVINGS = [];
 export const PAYCHECK = ['INSPERI', 'PAYROLL', 'ICIMS'];
@@ -16,7 +16,7 @@ export const INCOME_CATEGORIES: string[] = [
 	'OTHER'
 ];
 
-export const INCOME_CATEGORY_MAP: CatMap = {
+export const INCOME_CATEGORY_MAP: CategoryMap = {
   SAVINGS,
   PAYCHECK,
   BONUS,

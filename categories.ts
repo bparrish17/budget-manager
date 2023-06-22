@@ -1,7 +1,5 @@
-import { CategoryMap } from './models';
+import { CategoryMap } from './server/models';
 import * as _ from 'lodash';
-
-export const EXPENSE_CATEGORIES = [];
 
 const EXPENSE_CATEGORY_MAP_RAW = {
   MORTAGE: ['Citizens Bank Mortgage Payment'],
@@ -65,11 +63,15 @@ const EXPENSE_CATEGORY_MAP_RAW = {
   ],
 };
 
-export const EXPENSE_CATEGORY_MAP: CategoryMap = _.mapValues(
-  EXPENSE_CATEGORY_MAP_RAW,
+const allCategoriesToLowerCase = (rawCatMap) => _.mapValues(
+  rawCatMap,
   (values) => values.map((val) => val.toLowerCase())
 );
 
+export const EXPENSE_CATEGORY_MAP: CategoryMap = allCategoriesToLowerCase(EXPENSE_CATEGORY_MAP_RAW);
+
+// for the chase-specific "category" field that they provide
+// serves as backup option behind the description field
 export const CHASE_EXPENSE_CATEGORY_MAP: { [key: string]: string } = {
   'Food & Drink': 'EATING_OUT',
   'Groceries': 'GROCERIES',
@@ -79,3 +81,14 @@ export const CHASE_EXPENSE_CATEGORY_MAP: { [key: string]: string } = {
   'Health & Wellness': 'PERSONAL',
   'Professional Services': 'OTHER',
 }
+
+const INCOME_CATEGORY_MAP_RAW: CategoryMap = {
+  SAVINGS: [],
+  PAYCHECK: ['insperi', 'payroll', 'icims', 'gusto'],
+  BONUS: [],
+  INTEREST: ["interest paid"],
+  VENMO: ['venmo'],
+  OTHER: []
+}
+
+export const INCOME_CATEGORY_MAP: CategoryMap = allCategoriesToLowerCase(INCOME_CATEGORY_MAP_RAW);

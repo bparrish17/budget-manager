@@ -1,5 +1,5 @@
 
-export type CatMap = { [key: string]: string[] };
+export type CategoryMap = { [key: string]: string[] };
 
 export interface BatchUpdate {
   spreadsheetId?: string | number;

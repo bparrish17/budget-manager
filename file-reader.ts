@@ -1,40 +1,38 @@
-import { FilePaths, RawTransaction, RawTransactions } from "./server/models";
-import { AMEXTransaction, ChaseTransaction, RawChaseTransaction, USAATransaction } from "./server/transaction";
+import { FilePaths, RawTransaction } from "./server/models";
+import { AMEXTransaction, ChaseTransaction, USAATransaction } from "./server/transaction";
 const csv = require("csvtojson");
 
-export function convertCSVtoJSON(
+function isTransfer(transaction: RawTransaction) {
+  return [
+    "chase credit crd epay",
+    "amex epayment",
+    "usaa funds transfer",
+    "usaa transfer",
+    "online payment",
+    "payment thank you - web",
+    "american express credit card",
+    "chase credit card"
+  ].some((desc) => {
+    if (transaction.Description.toLowerCase().includes(desc)) {
+      console.log('IS TRANSFER', transaction.Description);
+      return true;
+    }
+    else return false;
+  })
+}
+
+export function getTransactionsFromCSV(
   filePath,
   parseParams: { [key: string]: unknown } = { noheader: false }
-): (transactionConverter: Function) => Promise<RawTransaction> {
-  return (transactionConverter) =>
+): (transactionConstructor: Function) => Promise<RawTransaction> {
+  return (transactionConstructor) =>
     csv(parseParams)
       .fromFile(filePath)
       .then((rawTransactions: RawTransaction[]) =>
         rawTransactions
-          .map((rawTrx) => transactionConverter(rawTrx))
-          .filter((trx) => trx !== null)
+          .filter((rawTrx) => !isTransfer(rawTrx))
+          .map((rawTrx) => transactionConstructor(rawTrx))
       );
-}
-
-function createUSAATransaction(transaction: RawTransaction): USAATransaction {
-	if (Object.keys(transaction).length) {
-    const hasDesc = (desc: string) => transaction.Description.toLowerCase().includes(desc)
-		if (hasDesc('chase credit crd epay')) return null;
-		if (hasDesc('amex epayment')) return null;
-		if (hasDesc('usaa funds transfer')) return null;
-		return new USAATransaction(transaction)
-	}
-}
-
-function createAMEXTransaction(transaction: RawTransaction): AMEXTransaction {
-  console.log('====', transaction.Description);
-  if (transaction.Description.toLowerCase().includes('online payment')) return null;
-	return new AMEXTransaction(transaction);
-}
-
-function createChaseTransaction(transaction: RawChaseTransaction): ChaseTransaction {
-	if (transaction.Type === 'Payment') return null;
-	return new ChaseTransaction(transaction);
 }
 
 export default async function main(filePaths: FilePaths): Promise<any> {
@@ -50,8 +48,8 @@ export default async function main(filePaths: FilePaths): Promise<any> {
   };
 
   return {
-    // usaa: await convertCSVtoJSON(filePaths.usaa, usaaParser)(createUSAATransaction),
-    amex: await convertCSVtoJSON(filePaths.amex)(createAMEXTransaction),
-    // chase: await convertCSVtoJSON(filePaths.chase)(createChaseTransaction)
+    usaa: await getTransactionsFromCSV(filePaths.usaa, usaaParser)((trx) => new USAATransaction(trx)),
+    amex: await getTransactionsFromCSV(filePaths.amex)((trx) => new AMEXTransaction(trx)),
+    chase: await getTransactionsFromCSV(filePaths.chase)((trx) => new ChaseTransaction(trx))
   }
 }

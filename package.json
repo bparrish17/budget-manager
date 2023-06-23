@@ -5,18 +5,24 @@
   "license": "Apache-2.0",
   "repository": "https://github.com/bparrish17/budget-manager",
   "scripts": {
-    "start": "nodemon --watch 'server/*.ts' --exec 'ts-node' app.ts"
+    "start": "nodemon --watch 'server/*.ts' --exec 'ts-node' app.ts",
+    "start-dev": "nodemon --exec 'ts-node' file-handler.ts -y 2023 -m May",
+    "june": "npx ts-node main.ts -y 2023 -m june",
+    "reset": "npx ts-node main.ts -r -y 2023 -m june"
   },
   "dependencies": {
     "4": "0.0.0",
+    "@google-cloud/local-auth": "^2.1.0",
     "body-parser": "~1.13.2",
+    "chalk": "^4.1.2",
+    "commander": "^10.0.1",
     "csvtojson": "^2.0.8",
     "express": "^4.13.4",
     "express-handlebars": "^3.0.0",
     "express-session": "^1.15.6",
     "formidable": "^1.2.1",
     "google-auth-library": "^3.1.1",
-    "googleapis": "^26.0.1",
+    "googleapis": "^105.0.0",
     "lodash": "^4.17.11",
     "moment": "^2.24.0",
     "morgan": "^1.7.0"

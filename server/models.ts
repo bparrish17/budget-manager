@@ -1,5 +1,5 @@
 
-export type CatMap = { [key: string]: string[] };
+export type CategoryMap = { [key: string]: string[] };
 
 export interface BatchUpdate {
   spreadsheetId?: string | number;
@@ -50,3 +50,26 @@ export interface GridData {
 export interface RowData {
   values: any[]
 }
+
+type Banks = 'usaa' | 'amex' | 'chase';
+
+export type FilePaths = {
+  [bank in Banks]: string | number;
+}
+
+export interface RawTransaction {
+  Date: string;
+  Description: string;
+  Amount: number;
+  Category?: string;
+}
+
+export interface RawChaseTransaction extends RawTransaction {
+	'Transaction Date': string;
+	'Post Date': string;
+}
+
+export type RawTransactions = {
+  [bank in Banks]: RawTransaction;
+}
+

@@ -6,7 +6,7 @@ const { google } = require('googleapis');
 const { OAuth2Client } = require('google-auth-library');
 
 const TEST_SHEET_ID = '1iRHLWOk7E_SPFO_n6Ok0xci__SUtApQGhseuOzz0ThI';
-const SHEET_ID = '1Kwlz2FG-nuHyQM0ieNsUZUfKTpq06OM-wnWcc3LT4Ko';
+const SHEET_ID = '18rJL09ZmrN85mEGMVtRVsqNsyWPp_Vz2HB3d76pmaM8';
 
 export class SheetsHelper {
   public service: any;
@@ -14,7 +14,7 @@ export class SheetsHelper {
   constructor(accessToken) {
     const auth = new OAuth2Client();
     auth.credentials = { access_token: accessToken };
-    this.service = google.sheets({version: 'v4', auth });
+    this.service = google.sheets({ version: 'v4', auth });
   }
 
   public appendValues(transactionData: Transaction[]) {

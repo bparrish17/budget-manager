@@ -14,7 +14,7 @@ export class SheetsHelper {
   constructor(accessToken) {
     const auth = new OAuth2Client();
     auth.credentials = { access_token: accessToken };
-    this.service = google.sheets({version: 'v4', auth });
+    this.service = google.sheets({ version: 'v4', auth });
   }
 
   public appendValues(transactionData: Transaction[]) {

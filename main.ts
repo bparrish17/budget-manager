@@ -1,6 +1,7 @@
 import { Command } from 'commander';
 import fileHandler, { resetFiles } from "./file-handler";
 import fileReader from "./file-reader"
+import sheetsWriter from "./sheets-writer";
 
 async function main() {
   const program = new Command();
@@ -23,8 +24,9 @@ async function main() {
     amex: '/Users/brianparrish/Documents/Finance/2023/6 - June/amex.csv',
     chase: '/Users/brianparrish/Documents/Finance/2023/6 - June/chase.csv'
   }
-  const result = await fileReader(filePaths);
-  console.log('result', result);
+  const transactions = await fileReader(filePaths);
+  await sheetsWriter(transactions);
+  console.log('result', transactions);
 }
 
 main();

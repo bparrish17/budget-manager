@@ -31,7 +31,7 @@ export function getTransactionsFromCSV(
       );
 }
 
-export default async function main(filePaths: FilePaths): Promise<any> {
+export default async function main(filePaths: FilePaths): Promise<Transaction[]> {
   const usaaParser = {
     colParser: {
       Date: "string",
@@ -43,9 +43,9 @@ export default async function main(filePaths: FilePaths): Promise<any> {
     },
   };
 
-  return {
-    usaa: await getTransactionsFromCSV(filePaths.usaa, usaaParser)((trx) => new USAATransaction(trx)),
-    amex: await getTransactionsFromCSV(filePaths.amex)((trx) => new AMEXTransaction(trx)),
-    chase: await getTransactionsFromCSV(filePaths.chase)((trx: RawChaseTransaction) => new ChaseTransaction(trx))
-  }
+  const usaa = await getTransactionsFromCSV(filePaths.usaa, usaaParser)((trx) => new USAATransaction(trx));
+  const amex = await getTransactionsFromCSV(filePaths.amex)((trx) => new AMEXTransaction(trx));
+  const chase = await getTransactionsFromCSV(filePaths.chase)((trx: RawChaseTransaction) => new ChaseTransaction(trx));
+
+  return [...usaa, ...amex, ...chase];
 }
